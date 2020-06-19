@@ -1,9 +1,15 @@
 package view;
 
+import java.awt.BorderLayout;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 
 import javax.swing.JFrame;
+import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 
 import model.Application;
@@ -17,6 +23,7 @@ public class MainWindow extends JFrame {
 	public static final int HEIGHT = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 			.getDisplayMode().getHeight();
 
+	private boolean isFullScreen = true;
 	private Application app;
 	private PanelOptions options;
 	private Canvas canvas;
@@ -75,12 +82,28 @@ public class MainWindow extends JFrame {
 		this.options = options;
 	}
 
+	public boolean isFullScreen() {
+		return isFullScreen;
+	}
+
+	public void setFullScreen(boolean isFullScreen) {
+		this.isFullScreen = isFullScreen;
+	}
+
 	public Application getApp() {
 		return app;
 	}
 
 	public void setApp(Application app) {
 		this.app = app;
+	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	public void setCanvas(Canvas canvas) {
+		this.canvas = canvas;
 	}
 
 	public static void main(String[] args) {

@@ -1,7 +1,10 @@
 package view;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -12,12 +15,17 @@ import javax.swing.border.LineBorder;
 
 import model.Object;
 
-public class Canvas extends JPanel implements MouseMotionListener, MouseListener {
+
+public class Canvas extends JPanel implements MouseMotionListener, MouseListener{
 
 	public static final int WIDTH = MainWindow.WIDTH - PanelOptions.WIDTH;
 	public static final int HEIGHT = MainWindow.HEIGHT;
 
 	private MainWindow window;
+	
+	private Color colorBackground;
+
+	
 
 	public Canvas(MainWindow window) {
 		setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
@@ -28,6 +36,8 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 		setSize(WIDTH, HEIGHT);
 		setLocation(0, 5);
 
+	
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
@@ -100,6 +110,8 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		
+		window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
 	}
 
@@ -107,15 +119,22 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 	public void mouseDragged(MouseEvent e) {
 
 		Object current = window.getApp().getCurrentObject();
+		
 
 		if (e.getX() >= current.getX() && e.getX() <= current.getX() + current.getWidth() && e.getY() >= current.getY()
 				&& e.getY() <= current.getY() + current.getHeight()) {
 
+			window.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+			
 			current.setX(e.getX() - current.getWidth() / 2);
 			current.setY(e.getY() - current.getHeight() / 2);
 
 			window.getOptions().updateValues();
 
+		}else {
+			
+			window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			
 		}
 
 	}
