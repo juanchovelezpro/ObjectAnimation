@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Esta clase se encarga de cargar las imagenes en el {@code Juego}.
+ * Esta clase se encarga de cargar las imagenes en la {@code Application}.
  * @author juanchovelezpro
  *
  */

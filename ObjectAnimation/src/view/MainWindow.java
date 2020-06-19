@@ -1,16 +1,12 @@
 package view;
 
-import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridLayout;
 import java.io.File;
 
-import javax.swing.*;
-
-import com.sun.javafx.runtime.SystemProperties;
+import javax.swing.JFrame;
+import javax.swing.UIManager;
 
 import model.Application;
-import threads.AnimationThread;
 import threads.ThreadUpdater;
 import tools.ImageLoader;
 

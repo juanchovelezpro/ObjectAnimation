@@ -6,13 +6,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import model.Object;
+
 import javax.swing.JPanel;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.border.BevelBorder;
+
+import model.Object;
 
 public class Canvas extends JPanel implements MouseMotionListener, MouseListener {
 

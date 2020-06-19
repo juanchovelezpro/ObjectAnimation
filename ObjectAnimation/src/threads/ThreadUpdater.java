@@ -1,7 +1,5 @@
 package threads;
 
-import javax.swing.SpinnerNumberModel;
-
 import view.MainWindow;
 import view.PanelOptions;
 

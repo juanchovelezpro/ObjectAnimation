@@ -1,8 +1,12 @@
 package view;
 
 import java.awt.Color;
-import java.awt.GridLayout;
-import model.Object;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -10,29 +14,16 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import java.awt.Font;
-import javax.swing.JSeparator;
-import javax.swing.border.MatteBorder;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.awt.event.ActionEvent;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import animation.Animation;
-
-import javax.swing.event.ChangeEvent;
+import model.Object;
 
 public class PanelOptions extends JPanel {
 
@@ -41,7 +32,7 @@ public class PanelOptions extends JPanel {
 
 	private MainWindow window;
 	private File fileSelected;
-	private JLabel labSpriteTextFile;
+	private JLabel labNoSprites;
 	private JSpinner spinnerRows;
 	private JSpinner spinnerCols;
 	private JSpinner spinnerNumSprites;
@@ -56,28 +47,34 @@ public class PanelOptions extends JPanel {
 	private JSpinner spinnerRefreshMove;
 
 	public PanelOptions(MainWindow window) {
-		setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
 
 		this.window = window;
+
+		setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
+		setLayout(null);
 		setSize(WIDTH, HEIGHT);
 		setLocation(MainWindow.WIDTH - WIDTH, 0);
 
-		setLayout(null);
+		settingComponents();
 
-		JLabel lblNewLabel = new JLabel("Sprite Sheet");
-		lblNewLabel.setFont(new Font("Lato", Font.BOLD, 25));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setBounds(0, 0, 300, 45);
-		add(lblNewLabel);
+	}
 
-		labSpriteTextFile = new JLabel("No sprites found!");
-		labSpriteTextFile.setHorizontalAlignment(SwingConstants.CENTER);
-		labSpriteTextFile.setFont(new Font("Lato", Font.BOLD, 12));
-		labSpriteTextFile.setBounds(0, 44, 300, 15);
-		add(labSpriteTextFile);
+	public void settingComponents() {
 
-		JButton btnNewButton = new JButton("Upload Sprite Sheet");
-		btnNewButton.addActionListener(a -> {
+		JLabel lblSprite = new JLabel("Sprite Sheet");
+		lblSprite.setFont(new Font("Lato", Font.BOLD, 25));
+		lblSprite.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSprite.setBounds(0, 449, 300, 45);
+		add(lblSprite);
+
+		labNoSprites = new JLabel("No sprites found!");
+		labNoSprites.setHorizontalAlignment(SwingConstants.CENTER);
+		labNoSprites.setFont(new Font("Lato", Font.BOLD, 12));
+		labNoSprites.setBounds(0, 493, 300, 15);
+		add(labNoSprites);
+
+		JButton btnAddSprite = new JButton("Add Sprite Sheet");
+		btnAddSprite.addActionListener(a -> {
 
 			// Handler sprites.
 			JFileChooser chooser = new JFileChooser();
@@ -93,7 +90,7 @@ public class PanelOptions extends JPanel {
 					pathImage = fileSelected.getAbsolutePath();
 					sprite = ImageIO.read(new File(pathImage));
 					window.getApp().setCurrentSprite(sprite);
-					labSpriteTextFile.setText(fileSelected.getName());
+					labNoSprites.setText(fileSelected.getName());
 					JOptionPane.showMessageDialog(null, "The Sprite has been uploaded successfully", "Sprite Uploaded",
 							JOptionPane.INFORMATION_MESSAGE, new ImageIcon(sprite));
 
@@ -106,18 +103,18 @@ public class PanelOptions extends JPanel {
 			}
 
 		});
-		btnNewButton.setBounds(29, 71, 239, 31);
-		add(btnNewButton);
+		btnAddSprite.setBounds(29, 510, 239, 31);
+		add(btnAddSprite);
 
-		JLabel lblNewLabel_2 = new JLabel("# Rows");
-		lblNewLabel_2.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2.setBounds(6, 122, 61, 26);
-		add(lblNewLabel_2);
+		JLabel lblRows = new JLabel("# Rows");
+		lblRows.setFont(new Font("Lato", Font.BOLD, 15));
+		lblRows.setBounds(10, 550, 61, 26);
+		add(lblRows);
 
-		JLabel lblNewLabel_2_1 = new JLabel("# Cols");
-		lblNewLabel_2_1.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2_1.setBounds(152, 121, 55, 28);
-		add(lblNewLabel_2_1);
+		JLabel lblCols = new JLabel("# Cols");
+		lblCols.setFont(new Font("Lato", Font.BOLD, 15));
+		lblCols.setBounds(156, 549, 55, 28);
+		add(lblCols);
 
 		SpinnerNumberModel model = new SpinnerNumberModel(1, 1, 9999, 1);
 
@@ -130,7 +127,7 @@ public class PanelOptions extends JPanel {
 				spinnerNumSprites.setModel(new SpinnerNumberModel(rows * cols, 1, rows * cols, 1));
 			}
 		});
-		spinnerRows.setBounds(64, 122, 76, 26);
+		spinnerRows.setBounds(68, 550, 76, 26);
 		add(spinnerRows);
 
 		SpinnerNumberModel model2 = new SpinnerNumberModel(1, 1, 9999, 1);
@@ -145,50 +142,50 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		spinnerCols.setBounds(205, 122, 76, 26);
+		spinnerCols.setBounds(209, 550, 76, 26);
 		add(spinnerCols);
 
-		JLabel lblNewLabel_2_2 = new JLabel("# Sprites");
-		lblNewLabel_2_2.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2_2.setBounds(4, 156, 63, 31);
-		add(lblNewLabel_2_2);
+		JLabel lblNumSprites = new JLabel("# Sprites");
+		lblNumSprites.setFont(new Font("Lato", Font.BOLD, 15));
+		lblNumSprites.setBounds(8, 584, 63, 31);
+		add(lblNumSprites);
 
 		spinnerNumSprites = new JSpinner();
 		spinnerNumSprites.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
-		spinnerNumSprites.setBounds(64, 158, 76, 26);
+		spinnerNumSprites.setBounds(68, 586, 76, 26);
 		add(spinnerNumSprites);
 
-		JLabel lblNewLabel_2_1_1 = new JLabel("Delay");
-		lblNewLabel_2_1_1.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2_1_1.setBounds(152, 157, 55, 28);
-		add(lblNewLabel_2_1_1);
+		JLabel lblDelay = new JLabel("Delay");
+		lblDelay.setFont(new Font("Lato", Font.BOLD, 15));
+		lblDelay.setBounds(156, 585, 55, 28);
+		add(lblDelay);
 
 		spinnerDelay = new JSpinner();
 		spinnerDelay.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
-		spinnerDelay.setBounds(205, 158, 76, 26);
+		spinnerDelay.setBounds(209, 586, 76, 26);
 		add(spinnerDelay);
 
 		JSeparator separator = new JSeparator();
-		separator.setBounds(0, 212, 300, 2);
+		separator.setBounds(0, 627, 300, 2);
 		add(separator);
 
 		JLabel lblObject = new JLabel("Object");
 		lblObject.setHorizontalAlignment(SwingConstants.CENTER);
 		lblObject.setFont(new Font("Lato", Font.BOLD, 25));
-		lblObject.setBounds(0, 209, 300, 45);
+		lblObject.setBounds(0, 202, 300, 45);
 		add(lblObject);
 
-		JLabel lblNewLabel_2_3 = new JLabel("POS X");
-		lblNewLabel_2_3.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2_3.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2_3.setBounds(8, 287, 61, 26);
-		add(lblNewLabel_2_3);
+		JLabel lblPosX = new JLabel("x");
+		lblPosX.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPosX.setFont(new Font("Lato", Font.BOLD, 15));
+		lblPosX.setBounds(8, 335, 61, 26);
+		add(lblPosX);
 
-		JLabel lblNewLabel_2_1_2 = new JLabel("POS Y");
-		lblNewLabel_2_1_2.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2_1_2.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2_1_2.setBounds(154, 286, 55, 28);
-		add(lblNewLabel_2_1_2);
+		JLabel lblPosY = new JLabel("y");
+		lblPosY.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPosY.setFont(new Font("Lato", Font.BOLD, 15));
+		lblPosY.setBounds(154, 334, 55, 28);
+		add(lblPosY);
 
 		spinnerPosX = new JSpinner();
 		spinnerPosX.addChangeListener(new ChangeListener() {
@@ -198,7 +195,7 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		spinnerPosX.setBounds(66, 287, 76, 26);
+		spinnerPosX.setBounds(66, 335, 76, 26);
 		spinnerPosX.getModel().setValue(window.getApp().getObject().getX());
 		add(spinnerPosX);
 
@@ -209,14 +206,14 @@ public class PanelOptions extends JPanel {
 				window.getApp().getCurrentObject().setY(Integer.parseInt(spinnerPosY.getModel().getValue().toString()));
 			}
 		});
-		spinnerPosY.setBounds(207, 287, 76, 26);
+		spinnerPosY.setBounds(207, 335, 76, 26);
 		spinnerPosY.getModel().setValue(window.getApp().getObject().getY());
 		add(spinnerPosY);
 
-		JLabel lblNewLabel_2_2_1 = new JLabel("SPEED X");
-		lblNewLabel_2_2_1.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2_2_1.setBounds(6, 321, 63, 31);
-		add(lblNewLabel_2_2_1);
+		JLabel lblSpeedX = new JLabel("Speed X");
+		lblSpeedX.setFont(new Font("Lato", Font.BOLD, 15));
+		lblSpeedX.setBounds(6, 369, 63, 31);
+		add(lblSpeedX);
 
 		spinnerSpeedX = new JSpinner();
 		spinnerSpeedX.addChangeListener(new ChangeListener() {
@@ -227,13 +224,13 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		spinnerSpeedX.setBounds(66, 323, 76, 26);
+		spinnerSpeedX.setBounds(66, 371, 76, 26);
 		add(spinnerSpeedX);
 
-		JLabel lblNewLabel_2_1_1_1 = new JLabel("SPEED Y");
-		lblNewLabel_2_1_1_1.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2_1_1_1.setBounds(145, 323, 67, 26);
-		add(lblNewLabel_2_1_1_1);
+		JLabel lblSpeedY = new JLabel("Speed Y");
+		lblSpeedY.setFont(new Font("Lato", Font.BOLD, 15));
+		lblSpeedY.setBounds(145, 371, 67, 26);
+		add(lblSpeedY);
 
 		spinnerSpeedY = new JSpinner();
 		spinnerSpeedY.addChangeListener(new ChangeListener() {
@@ -244,60 +241,55 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		spinnerSpeedY.setBounds(205, 323, 76, 26);
+		spinnerSpeedY.setBounds(205, 371, 76, 26);
 		add(spinnerSpeedY);
 
 		JSeparator separator_1 = new JSeparator();
-		separator_1.setBounds(0, 391, 300, 2);
+		separator_1.setBounds(0, 449, 300, 2);
 		add(separator_1);
 
-		JLabel lblProcess = new JLabel("Animation");
-		lblProcess.setHorizontalAlignment(SwingConstants.CENTER);
-		lblProcess.setFont(new Font("Lato", Font.BOLD, 25));
-		lblProcess.setBounds(0, 391, 300, 45);
-		add(lblProcess);
+		JLabel lblAnimation = new JLabel("Animation");
+		lblAnimation.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAnimation.setFont(new Font("Lato", Font.BOLD, 25));
+		lblAnimation.setBounds(0, 627, 300, 45);
+		add(lblAnimation);
 
-		JLabel lblNewLabel_2_3_1 = new JLabel("Time Refresh (ms)");
-		lblNewLabel_2_3_1.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2_3_1.setFont(new Font("Lato", Font.BOLD, 12));
-		lblNewLabel_2_3_1.setBounds(0, 433, 117, 31);
-		add(lblNewLabel_2_3_1);
+		JLabel lblTimeRefresh = new JLabel("Time Refresh (ms)");
+		lblTimeRefresh.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTimeRefresh.setFont(new Font("Lato", Font.BOLD, 12));
+		lblTimeRefresh.setBounds(5, 667, 117, 31);
+		add(lblTimeRefresh);
 
 		spinnerTimeRefresh = new JSpinner();
 		spinnerTimeRefresh.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				
-				
+
 			}
 		});
 		spinnerTimeRefresh.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
-		spinnerTimeRefresh.setBounds(107, 435, 174, 26);
+		spinnerTimeRefresh.setBounds(112, 669, 174, 26);
 		add(spinnerTimeRefresh);
 
-		JButton btnNewButton_1 = new JButton("Start");
-		btnNewButton_1.setBounds(10, 475, 90, 28);
-		add(btnNewButton_1);
+		JButton btnPause = new JButton("Pause");
+		btnPause.setBounds(168, 707, 117, 28);
+		add(btnPause);
 
-		JButton btnNewButton_1_1 = new JButton("Pause");
-		btnNewButton_1_1.setBounds(107, 475, 90, 28);
-		add(btnNewButton_1_1);
-
-		JButton btnNewButton_1_1_1 = new JButton("Resume");
-		btnNewButton_1_1_1.setBounds(205, 475, 90, 28);
-		add(btnNewButton_1_1_1);
+		JButton btnResume = new JButton("Resume");
+		btnResume.setBounds(25, 707, 117, 28);
+		add(btnResume);
 
 		JSeparator separator_1_1 = new JSeparator();
-		separator_1_1.setBounds(0, 527, 300, 2);
+		separator_1_1.setBounds(0, 0, 300, 2);
 		add(separator_1_1);
 
-		JLabel lblHandler = new JLabel("Handler");
-		lblHandler.setHorizontalAlignment(SwingConstants.CENTER);
-		lblHandler.setFont(new Font("Lato", Font.BOLD, 25));
-		lblHandler.setBounds(0, 527, 300, 45);
-		add(lblHandler);
+		JLabel lblOptions = new JLabel("Options");
+		lblOptions.setHorizontalAlignment(SwingConstants.CENTER);
+		lblOptions.setFont(new Font("Lato", Font.BOLD, 25));
+		lblOptions.setBounds(0, 0, 300, 45);
+		add(lblOptions);
 
-		JButton btnNewButton_2 = new JButton("Add Animation to Object");
-		btnNewButton_2.addActionListener(new ActionListener() {
+		JButton btnAddAnimation = new JButton("Add Animation to Object");
+		btnAddAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
 				// Adding animation to current object
@@ -313,12 +305,12 @@ public class PanelOptions extends JPanel {
 
 					try {
 						Animation animation = new Animation(currentSprite, sprites, delay, cols, rows,
-								window.getApp().getCurrentObject(),refresh);
+								window.getApp().getCurrentObject(), refresh);
 
 						window.getApp().getCurrentObject().setAnimation(animation);
 
 						window.getApp().getCurrentObject().getAnimation().getThread().start();
-						
+
 //						spinnerTimeRefresh.getModel().setValue(window.getApp().getCurrentObject().getAnimation().getTimeRefresh());
 
 					} catch (Exception ex) {
@@ -338,22 +330,22 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		btnNewButton_2.setBounds(52, 614, 190, 31);
-		add(btnNewButton_2);
+		btnAddAnimation.setBounds(52, 87, 190, 31);
+		add(btnAddAnimation);
 
-		JButton btnNewButton_2_1_1 = new JButton("My Animations");
-		btnNewButton_2_1_1.setBounds(52, 694, 190, 31);
-		add(btnNewButton_2_1_1);
+		JButton btnMyAnimations = new JButton("My Animations");
+		btnMyAnimations.setBounds(52, 159, 190, 31);
+		add(btnMyAnimations);
 
 		JSeparator separator_1_1_1 = new JSeparator();
-		separator_1_1_1.setBounds(0, 751, 300, 2);
+		separator_1_1_1.setBounds(0, 202, 300, 2);
 		add(separator_1_1_1);
 
-		JLabel lblNewLabel_2_3_1_1 = new JLabel("Refresh Move (ms)");
-		lblNewLabel_2_3_1_1.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2_3_1_1.setFont(new Font("Lato", Font.BOLD, 12));
-		lblNewLabel_2_3_1_1.setBounds(0, 358, 117, 31);
-		add(lblNewLabel_2_3_1_1);
+		JLabel lblRefreshMove = new JLabel("Refresh Move (ms)");
+		lblRefreshMove.setHorizontalAlignment(SwingConstants.CENTER);
+		lblRefreshMove.setFont(new Font("Lato", Font.BOLD, 12));
+		lblRefreshMove.setBounds(0, 406, 117, 31);
+		add(lblRefreshMove);
 
 		spinnerRefreshMove = new JSpinner();
 		spinnerRefreshMove.addChangeListener(new ChangeListener() {
@@ -365,20 +357,20 @@ public class PanelOptions extends JPanel {
 			}
 		});
 		spinnerRefreshMove.setModel(new SpinnerNumberModel(new Integer(10), new Integer(1), null, new Integer(1)));
-		spinnerRefreshMove.setBounds(110, 361, 174, 26);
+		spinnerRefreshMove.setBounds(110, 409, 174, 26);
 		add(spinnerRefreshMove);
 
-		JLabel lblNewLabel_2_3_2 = new JLabel("WIDTH");
-		lblNewLabel_2_3_2.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2_3_2.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2_3_2.setBounds(6, 256, 61, 26);
-		add(lblNewLabel_2_3_2);
+		JLabel lblWidth = new JLabel("Width");
+		lblWidth.setHorizontalAlignment(SwingConstants.CENTER);
+		lblWidth.setFont(new Font("Lato", Font.BOLD, 15));
+		lblWidth.setBounds(6, 304, 61, 26);
+		add(lblWidth);
 
-		JLabel lblNewLabel_2_1_2_1 = new JLabel("HEIGHT");
-		lblNewLabel_2_1_2_1.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2_1_2_1.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNewLabel_2_1_2_1.setBounds(140, 258, 67, 22);
-		add(lblNewLabel_2_1_2_1);
+		JLabel lblHeight = new JLabel("Height");
+		lblHeight.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHeight.setFont(new Font("Lato", Font.BOLD, 15));
+		lblHeight.setBounds(140, 306, 67, 22);
+		add(lblHeight);
 
 		spinnerWidth = new JSpinner();
 		spinnerWidth.addChangeListener(new ChangeListener() {
@@ -390,7 +382,7 @@ public class PanelOptions extends JPanel {
 			}
 		});
 		spinnerWidth.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
-		spinnerWidth.setBounds(64, 256, 76, 26);
+		spinnerWidth.setBounds(64, 304, 76, 26);
 		add(spinnerWidth);
 
 		spinnerHeight = new JSpinner();
@@ -404,11 +396,11 @@ public class PanelOptions extends JPanel {
 			}
 		});
 		spinnerHeight.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
-		spinnerHeight.setBounds(205, 256, 76, 26);
+		spinnerHeight.setBounds(205, 304, 76, 26);
 		add(spinnerHeight);
 
-		JButton btnNewButton_2_1 = new JButton("Create an Object");
-		btnNewButton_2_1.addActionListener(new ActionListener() {
+		JButton btnCreateObject = new JButton("Create a new Object");
+		btnCreateObject.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
 				String name = JOptionPane.showInputDialog(null, "Please enter a name to this Object",
@@ -431,22 +423,32 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		btnNewButton_2_1.setBounds(52, 571, 190, 31);
-		add(btnNewButton_2_1);
+		btnCreateObject.setBounds(52, 50, 190, 31);
+		add(btnCreateObject);
 
-		JButton btnNewButton_2_1_2 = new JButton("Save Animations Into Object");
-		btnNewButton_2_1_2.addActionListener(new ActionListener() {
+		JButton btnSaveAnimations = new JButton("Save Animations Into Object");
+		btnSaveAnimations.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
 			}
 		});
-		btnNewButton_2_1_2.setBounds(52, 651, 190, 31);
-		add(btnNewButton_2_1_2);
+		btnSaveAnimations.setBounds(52, 124, 190, 31);
+		add(btnSaveAnimations);
+
+		JLabel lblNoSkinFound = new JLabel("No skin found!");
+		lblNoSkinFound.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNoSkinFound.setFont(new Font("Lato", Font.BOLD, 12));
+		lblNoSkinFound.setBounds(0, 244, 300, 15);
+		add(lblNoSkinFound);
+
+		JButton btnUploadSkin = new JButton("Add Skin");
+		btnUploadSkin.setBounds(29, 263, 239, 31);
+		add(btnUploadSkin);
 
 	}
 
 	public JLabel getLabSpriteTextFile() {
-		return labSpriteTextFile;
+		return labNoSprites;
 	}
 
 	public JSpinner getSpinnerRows() {
@@ -512,12 +514,11 @@ public class PanelOptions extends JPanel {
 		spinnerRefreshMove.getModel().setValue(currentObject.getRefreshMove());
 		spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
 		spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
-		
-		if(currentObject.getAnimation()!= null)
-		spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
+
+		if (currentObject.getAnimation() != null)
+			spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
 		else
-		spinnerTimeRefresh.getModel().setValue(1);
-			
+			spinnerTimeRefresh.getModel().setValue(1);
 
 	}
 
@@ -532,11 +533,11 @@ public class PanelOptions extends JPanel {
 		spinnerRefreshMove.getModel().setValue(currentObject.getRefreshMove());
 		spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
 		spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
-		
-		if(currentObject.getAnimation()!= null)
-		spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
+
+		if (currentObject.getAnimation() != null)
+			spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
 		else
-		spinnerTimeRefresh.getModel().setValue(1);
+			spinnerTimeRefresh.getModel().setValue(1);
 
 	}
 
