@@ -2,8 +2,11 @@ package view;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -24,10 +27,12 @@ import javax.swing.event.ChangeListener;
 
 import animation.Animation;
 import model.Object;
+import tools.ImageLoader;
+import javax.swing.JScrollPane;
 
 public class PanelOptions extends JPanel {
 
-	public static final int WIDTH = 300;
+	public static final int WIDTH = 310;
 	public static final int HEIGHT = MainWindow.HEIGHT;
 
 	private MainWindow window;
@@ -56,7 +61,7 @@ public class PanelOptions extends JPanel {
 		setLocation(MainWindow.WIDTH - WIDTH, 0);
 
 		settingComponents();
-
+	
 	}
 
 	public void settingComponents() {
@@ -64,19 +69,19 @@ public class PanelOptions extends JPanel {
 		JLabel lblSprite = new JLabel("Sprite Sheet");
 		lblSprite.setFont(new Font("Lato", Font.BOLD, 25));
 		lblSprite.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSprite.setBounds(0, 449, 300, 45);
+		lblSprite.setBounds(10, 449, 300, 45);
 		add(lblSprite);
 
 		labNoSprites = new JLabel("No sprites found!");
 		labNoSprites.setHorizontalAlignment(SwingConstants.CENTER);
 		labNoSprites.setFont(new Font("Lato", Font.BOLD, 12));
-		labNoSprites.setBounds(0, 493, 300, 15);
+		labNoSprites.setBounds(10, 493, 300, 15);
 		add(labNoSprites);
 
 		JButton btnAddSprite = new JButton("Add Sprite Sheet");
 		btnAddSprite.addActionListener(a -> {
 
-			// Handler sprites.
+			// Adding a sprite sheet
 			JFileChooser chooser = new JFileChooser();
 			chooser.showDialog(null, "Upload Sprites");
 
@@ -103,17 +108,17 @@ public class PanelOptions extends JPanel {
 			}
 
 		});
-		btnAddSprite.setBounds(29, 510, 239, 31);
+		btnAddSprite.setBounds(39, 510, 239, 31);
 		add(btnAddSprite);
 
 		JLabel lblRows = new JLabel("# Rows");
 		lblRows.setFont(new Font("Lato", Font.BOLD, 15));
-		lblRows.setBounds(10, 550, 61, 26);
+		lblRows.setBounds(20, 550, 61, 26);
 		add(lblRows);
 
 		JLabel lblCols = new JLabel("# Cols");
 		lblCols.setFont(new Font("Lato", Font.BOLD, 15));
-		lblCols.setBounds(156, 549, 55, 28);
+		lblCols.setBounds(166, 549, 55, 28);
 		add(lblCols);
 
 		SpinnerNumberModel model = new SpinnerNumberModel(1, 1, 9999, 1);
@@ -127,7 +132,7 @@ public class PanelOptions extends JPanel {
 				spinnerNumSprites.setModel(new SpinnerNumberModel(rows * cols, 1, rows * cols, 1));
 			}
 		});
-		spinnerRows.setBounds(68, 550, 76, 26);
+		spinnerRows.setBounds(78, 550, 76, 26);
 		add(spinnerRows);
 
 		SpinnerNumberModel model2 = new SpinnerNumberModel(1, 1, 9999, 1);
@@ -142,49 +147,49 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		spinnerCols.setBounds(209, 550, 76, 26);
+		spinnerCols.setBounds(219, 550, 76, 26);
 		add(spinnerCols);
 
 		JLabel lblNumSprites = new JLabel("# Sprites");
 		lblNumSprites.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNumSprites.setBounds(8, 584, 63, 31);
+		lblNumSprites.setBounds(18, 584, 63, 31);
 		add(lblNumSprites);
 
 		spinnerNumSprites = new JSpinner();
 		spinnerNumSprites.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
-		spinnerNumSprites.setBounds(68, 586, 76, 26);
+		spinnerNumSprites.setBounds(78, 586, 76, 26);
 		add(spinnerNumSprites);
 
 		JLabel lblDelay = new JLabel("Delay");
 		lblDelay.setFont(new Font("Lato", Font.BOLD, 15));
-		lblDelay.setBounds(156, 585, 55, 28);
+		lblDelay.setBounds(166, 585, 55, 28);
 		add(lblDelay);
 
 		spinnerDelay = new JSpinner();
 		spinnerDelay.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
-		spinnerDelay.setBounds(209, 586, 76, 26);
+		spinnerDelay.setBounds(219, 586, 76, 26);
 		add(spinnerDelay);
 
 		JSeparator separator = new JSeparator();
-		separator.setBounds(0, 627, 300, 2);
+		separator.setBounds(0, 627, 310, 2);
 		add(separator);
 
 		JLabel lblObject = new JLabel("Object");
 		lblObject.setHorizontalAlignment(SwingConstants.CENTER);
 		lblObject.setFont(new Font("Lato", Font.BOLD, 25));
-		lblObject.setBounds(0, 202, 300, 45);
+		lblObject.setBounds(10, 202, 300, 45);
 		add(lblObject);
 
 		JLabel lblPosX = new JLabel("x");
 		lblPosX.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPosX.setFont(new Font("Lato", Font.BOLD, 15));
-		lblPosX.setBounds(8, 335, 61, 26);
+		lblPosX.setBounds(18, 335, 61, 26);
 		add(lblPosX);
 
 		JLabel lblPosY = new JLabel("y");
 		lblPosY.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPosY.setFont(new Font("Lato", Font.BOLD, 15));
-		lblPosY.setBounds(154, 334, 55, 28);
+		lblPosY.setBounds(164, 334, 55, 28);
 		add(lblPosY);
 
 		spinnerPosX = new JSpinner();
@@ -195,7 +200,7 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		spinnerPosX.setBounds(66, 335, 76, 26);
+		spinnerPosX.setBounds(76, 335, 76, 26);
 		spinnerPosX.getModel().setValue(window.getApp().getObject().getX());
 		add(spinnerPosX);
 
@@ -206,13 +211,13 @@ public class PanelOptions extends JPanel {
 				window.getApp().getCurrentObject().setY(Integer.parseInt(spinnerPosY.getModel().getValue().toString()));
 			}
 		});
-		spinnerPosY.setBounds(207, 335, 76, 26);
+		spinnerPosY.setBounds(217, 335, 76, 26);
 		spinnerPosY.getModel().setValue(window.getApp().getObject().getY());
 		add(spinnerPosY);
 
 		JLabel lblSpeedX = new JLabel("Speed X");
 		lblSpeedX.setFont(new Font("Lato", Font.BOLD, 15));
-		lblSpeedX.setBounds(6, 369, 63, 31);
+		lblSpeedX.setBounds(16, 369, 63, 31);
 		add(lblSpeedX);
 
 		spinnerSpeedX = new JSpinner();
@@ -224,12 +229,12 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		spinnerSpeedX.setBounds(66, 371, 76, 26);
+		spinnerSpeedX.setBounds(76, 371, 76, 26);
 		add(spinnerSpeedX);
 
 		JLabel lblSpeedY = new JLabel("Speed Y");
 		lblSpeedY.setFont(new Font("Lato", Font.BOLD, 15));
-		lblSpeedY.setBounds(145, 371, 67, 26);
+		lblSpeedY.setBounds(155, 371, 67, 26);
 		add(lblSpeedY);
 
 		spinnerSpeedY = new JSpinner();
@@ -241,23 +246,23 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		spinnerSpeedY.setBounds(205, 371, 76, 26);
+		spinnerSpeedY.setBounds(215, 371, 76, 26);
 		add(spinnerSpeedY);
 
 		JSeparator separator_1 = new JSeparator();
-		separator_1.setBounds(0, 449, 300, 2);
+		separator_1.setBounds(0, 449, 310, 2);
 		add(separator_1);
 
 		JLabel lblAnimation = new JLabel("Animation");
 		lblAnimation.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAnimation.setFont(new Font("Lato", Font.BOLD, 25));
-		lblAnimation.setBounds(0, 627, 300, 45);
+		lblAnimation.setBounds(88, 632, 133, 43);
 		add(lblAnimation);
 
 		JLabel lblTimeRefresh = new JLabel("Time Refresh (ms)");
 		lblTimeRefresh.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTimeRefresh.setFont(new Font("Lato", Font.BOLD, 12));
-		lblTimeRefresh.setBounds(5, 667, 117, 31);
+		lblTimeRefresh.setBounds(14, 677, 117, 31);
 		add(lblTimeRefresh);
 
 		spinnerTimeRefresh = new JSpinner();
@@ -267,25 +272,17 @@ public class PanelOptions extends JPanel {
 			}
 		});
 		spinnerTimeRefresh.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
-		spinnerTimeRefresh.setBounds(112, 669, 174, 26);
+		spinnerTimeRefresh.setBounds(121, 679, 174, 26);
 		add(spinnerTimeRefresh);
 
-		JButton btnPause = new JButton("Pause");
-		btnPause.setBounds(168, 707, 117, 28);
-		add(btnPause);
-
-		JButton btnResume = new JButton("Resume");
-		btnResume.setBounds(25, 707, 117, 28);
-		add(btnResume);
-
 		JSeparator separator_1_1 = new JSeparator();
-		separator_1_1.setBounds(0, 0, 300, 2);
+		separator_1_1.setBounds(-5, 746, 326, 2);
 		add(separator_1_1);
 
 		JLabel lblOptions = new JLabel("Options");
 		lblOptions.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOptions.setFont(new Font("Lato", Font.BOLD, 25));
-		lblOptions.setBounds(0, 0, 300, 45);
+		lblOptions.setBounds(10, 0, 300, 45);
 		add(lblOptions);
 
 		JButton btnAddAnimation = new JButton("Add Animation to Object");
@@ -330,21 +327,21 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		btnAddAnimation.setBounds(52, 87, 190, 31);
+		btnAddAnimation.setBounds(62, 87, 190, 31);
 		add(btnAddAnimation);
 
 		JButton btnMyAnimations = new JButton("My Animations");
-		btnMyAnimations.setBounds(52, 159, 190, 31);
+		btnMyAnimations.setBounds(62, 159, 190, 31);
 		add(btnMyAnimations);
 
 		JSeparator separator_1_1_1 = new JSeparator();
-		separator_1_1_1.setBounds(0, 202, 300, 2);
+		separator_1_1_1.setBounds(0, 202, 310, 2);
 		add(separator_1_1_1);
 
 		JLabel lblRefreshMove = new JLabel("Refresh Move (ms)");
 		lblRefreshMove.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRefreshMove.setFont(new Font("Lato", Font.BOLD, 12));
-		lblRefreshMove.setBounds(0, 406, 117, 31);
+		lblRefreshMove.setBounds(10, 406, 117, 31);
 		add(lblRefreshMove);
 
 		spinnerRefreshMove = new JSpinner();
@@ -357,19 +354,19 @@ public class PanelOptions extends JPanel {
 			}
 		});
 		spinnerRefreshMove.setModel(new SpinnerNumberModel(new Integer(10), new Integer(1), null, new Integer(1)));
-		spinnerRefreshMove.setBounds(110, 409, 174, 26);
+		spinnerRefreshMove.setBounds(120, 409, 174, 26);
 		add(spinnerRefreshMove);
 
 		JLabel lblWidth = new JLabel("Width");
 		lblWidth.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWidth.setFont(new Font("Lato", Font.BOLD, 15));
-		lblWidth.setBounds(6, 304, 61, 26);
+		lblWidth.setBounds(16, 304, 61, 26);
 		add(lblWidth);
 
 		JLabel lblHeight = new JLabel("Height");
 		lblHeight.setHorizontalAlignment(SwingConstants.CENTER);
 		lblHeight.setFont(new Font("Lato", Font.BOLD, 15));
-		lblHeight.setBounds(140, 306, 67, 22);
+		lblHeight.setBounds(150, 306, 67, 22);
 		add(lblHeight);
 
 		spinnerWidth = new JSpinner();
@@ -382,7 +379,7 @@ public class PanelOptions extends JPanel {
 			}
 		});
 		spinnerWidth.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
-		spinnerWidth.setBounds(64, 304, 76, 26);
+		spinnerWidth.setBounds(74, 304, 76, 26);
 		add(spinnerWidth);
 
 		spinnerHeight = new JSpinner();
@@ -396,13 +393,15 @@ public class PanelOptions extends JPanel {
 			}
 		});
 		spinnerHeight.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
-		spinnerHeight.setBounds(205, 304, 76, 26);
+		spinnerHeight.setBounds(215, 304, 76, 26);
 		add(spinnerHeight);
 
 		JButton btnCreateObject = new JButton("Create a new Object");
 		btnCreateObject.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
+				// Creating and adding an object
+				
 				String name = JOptionPane.showInputDialog(null, "Please enter a name to this Object",
 						"Adding an Object", JOptionPane.QUESTION_MESSAGE);
 
@@ -423,7 +422,7 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		btnCreateObject.setBounds(52, 50, 190, 31);
+		btnCreateObject.setBounds(62, 50, 190, 31);
 		add(btnCreateObject);
 
 		JButton btnSaveAnimations = new JButton("Save Animations Into Object");
@@ -432,18 +431,40 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		btnSaveAnimations.setBounds(52, 124, 190, 31);
+		btnSaveAnimations.setBounds(62, 124, 190, 31);
 		add(btnSaveAnimations);
 
 		JLabel lblNoSkinFound = new JLabel("No skin found!");
 		lblNoSkinFound.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNoSkinFound.setFont(new Font("Lato", Font.BOLD, 12));
-		lblNoSkinFound.setBounds(0, 244, 300, 15);
+		lblNoSkinFound.setBounds(10, 244, 300, 15);
 		add(lblNoSkinFound);
 
 		JButton btnUploadSkin = new JButton("Add Skin");
-		btnUploadSkin.setBounds(29, 263, 239, 31);
+		btnUploadSkin.setBounds(39, 263, 239, 31);
 		add(btnUploadSkin);
+		
+		JLabel lblPlayPause = new JLabel("");
+		lblPlayPause.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				
+			// Resume and pause current object's animation
+				
+				
+				
+			}
+		});
+		lblPlayPause.setBounds(240, 635, 40, 40);
+		
+		BufferedImage iconPlay = ImageLoader.cargarSprites("images/playpause.png");
+		Image myIconPlay = iconPlay.getScaledInstance(lblPlayPause.getWidth(), lblPlayPause.getHeight(), Image.SCALE_SMOOTH);
+		lblPlayPause.setIcon(new ImageIcon(myIconPlay));
+		
+		add(lblPlayPause);
+		
+		
+		
 
 	}
 

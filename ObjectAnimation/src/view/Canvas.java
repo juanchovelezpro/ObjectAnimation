@@ -15,7 +15,7 @@ import model.Object;
 public class Canvas extends JPanel implements MouseMotionListener, MouseListener {
 
 	public static final int WIDTH = MainWindow.WIDTH - PanelOptions.WIDTH;
-	public static final int HEIGHT = MainWindow.HEIGHT - 50;
+	public static final int HEIGHT = MainWindow.HEIGHT;
 
 	private MainWindow window;
 

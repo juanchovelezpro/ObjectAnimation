@@ -28,8 +28,9 @@ public class MainWindow extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(WIDTH, HEIGHT);
+		setUndecorated(true);
+		setExtendedState(MAXIMIZED_BOTH);
 		setLocationRelativeTo(null);
-		setResizable(false);
 
 		setIconImage(ImageLoader.cargarImagen("images/icon.jpg"));
 

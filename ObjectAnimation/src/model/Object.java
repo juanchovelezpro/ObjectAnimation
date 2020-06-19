@@ -242,7 +242,7 @@ public class Object extends Thread implements Comparable<Object> {
 	@Override
 	public String toString(){
 		
-		return "ID NAME:" + nameID+ "X: "+x;
+		return "ID NAME:" + nameID+ ", X: "+x;
 		
 	}
 
