@@ -1,6 +1,8 @@
 package view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -15,11 +17,13 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -43,6 +47,8 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 	public static final int HEIGHT = MainWindow.HEIGHT * 4;
 
 	private MainWindow window;
+	private ArrayList<JPanel> myPanels;
+
 	private File fileSelected;
 	private JLabel labNoSprites;
 	private JSpinner spinnerRows;
@@ -57,9 +63,45 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 	private JSpinner spinnerWidth;
 	private JSpinner spinnerHeight;
 	private JSpinner spinnerRefreshMove;
-	
+
 	// Point to get the origin position when the panel gonna be dragged up or down.
 	private Point origin;
+	private JButton btnCreateObject;
+	private JLabel lblOptions;
+	private JButton btnAddAnimation;
+	private JButton btnFullScreen;
+	private JButton btnAddSprite;
+	private JButton btnMyObjects;
+	private JButton btnBackgroundImage;
+	private JButton btnUploadSkin;
+	private JButton btnSettings;
+	private JButton btnCanvasColor;
+	private JLabel lblPosX;
+	private JLabel lblDelay;
+	private JLabel lblBackgroundImage;
+	private JLabel lblNumSprites;
+	private JLabel lblAnimation;
+	private JLabel lblSpeedX;
+	private JLabel lblRefreshMove;
+	private JLabel lblCanvas;
+	private JLabel lblPosY;
+	private JLabel lblNoSkinFound;
+	private JLabel lblPlayPause;
+	private JLabel lblHeight;
+	private JLabel lblCols;
+	private JLabel lblWidth;
+	private JLabel lblRows;
+	private JLabel lblObject;
+	private JLabel lblTimeRefresh;
+	private JLabel lblBackgroundColor;
+	private JLabel lblSprite;
+	private JLabel lblSpeedY;
+	private JPanel panelOptions;
+	private JPanel panelAnimation;
+	private JPanel panelCanvas;
+	private JPanel panelSpriteSheet;
+	private JPanel panelObject;
+	private JPanel aux;
 
 	public PanelOptions(MainWindow window) {
 
@@ -70,7 +112,10 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		setLocation(MainWindow.WIDTH - WIDTH, 0);
 
+		myPanels = new ArrayList<JPanel>();
+
 		settingComponents();
+		addPanelsToList();
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -79,20 +124,20 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 	public void settingComponents() {
 
-		JPanel aux = new JPanel();
+		aux = new JPanel();
 
-		SpringLayout springLayout = new SpringLayout();
-		aux.setLayout(springLayout);
+		SpringLayout sl_aux = new SpringLayout();
+		aux.setLayout(sl_aux);
 
-		JPanel panelSpriteSheet = new JPanel();
-		springLayout.putConstraint(SpringLayout.NORTH, panelSpriteSheet, 422, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.WEST, panelSpriteSheet, 1, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, panelSpriteSheet, 592, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.EAST, panelSpriteSheet, 307, SpringLayout.WEST, this);
+		panelSpriteSheet = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelSpriteSheet, 422, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.WEST, panelSpriteSheet, 1, SpringLayout.WEST, this);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelSpriteSheet, 592, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.EAST, panelSpriteSheet, 307, SpringLayout.WEST, this);
 		aux.add(panelSpriteSheet);
 		panelSpriteSheet.setLayout(null);
 
-		JLabel lblSprite = new JLabel("Sprite Sheet");
+		lblSprite = new JLabel("Sprite Sheet");
 		lblSprite.setBounds(10, 0, 300, 45);
 		panelSpriteSheet.add(lblSprite);
 		lblSprite.setFont(new Font("Lato", Font.BOLD, 25));
@@ -104,17 +149,17 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		labNoSprites.setHorizontalAlignment(SwingConstants.CENTER);
 		labNoSprites.setFont(new Font("Lato", Font.BOLD, 12));
 
-		JButton btnAddSprite = new JButton("Add Sprite Sheet");
+		btnAddSprite = new JButton("Add Sprite Sheet");
 		btnAddSprite.setBounds(39, 61, 239, 31);
 		panelSpriteSheet.add(btnAddSprite);
 
-		JLabel lblRows = new JLabel("# Rows");
+		lblRows = new JLabel("# Rows");
 		lblRows.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRows.setBounds(10, 101, 76, 26);
 		panelSpriteSheet.add(lblRows);
 		lblRows.setFont(new Font("Lato", Font.BOLD, 15));
 
-		JLabel lblCols = new JLabel("# Cols");
+		lblCols = new JLabel("# Cols");
 		lblCols.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCols.setBounds(108, 100, 76, 28);
 		panelSpriteSheet.add(lblCols);
@@ -131,7 +176,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		spinnerCols.setBounds(110, 124, 84, 26);
 		panelSpriteSheet.add(spinnerCols);
 
-		JLabel lblNumSprites = new JLabel("# Sprites");
+		lblNumSprites = new JLabel("# Sprites");
 		lblNumSprites.setBounds(215, 99, 63, 31);
 		panelSpriteSheet.add(lblNumSprites);
 		lblNumSprites.setFont(new Font("Lato", Font.BOLD, 15));
@@ -192,27 +237,27 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 		});
 
-		JPanel panelObject = new JPanel();
-		springLayout.putConstraint(SpringLayout.NORTH, panelObject, 167, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.WEST, panelObject, 1, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, panelObject, 422, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.EAST, panelObject, 306, SpringLayout.WEST, this);
+		panelObject = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelObject, 167, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.WEST, panelObject, 1, SpringLayout.WEST, this);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelObject, 422, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.EAST, panelObject, 306, SpringLayout.WEST, this);
 		aux.add(panelObject);
 		panelObject.setLayout(null);
 
-		JLabel lblObject = new JLabel("Object");
+		lblObject = new JLabel("Object");
 		lblObject.setBounds(1, 6, 306, 45);
 		panelObject.add(lblObject);
 		lblObject.setHorizontalAlignment(SwingConstants.CENTER);
 		lblObject.setFont(new Font("Lato", Font.BOLD, 25));
 
-		JLabel lblPosX = new JLabel("x");
+		lblPosX = new JLabel("x");
 		lblPosX.setBounds(14, 139, 61, 26);
 		panelObject.add(lblPosX);
 		lblPosX.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPosX.setFont(new Font("Lato", Font.BOLD, 15));
 
-		JLabel lblPosY = new JLabel("y");
+		lblPosY = new JLabel("y");
 		lblPosY.setBounds(160, 138, 55, 28);
 		panelObject.add(lblPosY);
 		lblPosY.setHorizontalAlignment(SwingConstants.CENTER);
@@ -226,7 +271,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		spinnerPosY.setBounds(213, 139, 76, 26);
 		panelObject.add(spinnerPosY);
 
-		JLabel lblSpeedX = new JLabel("Speed X");
+		lblSpeedX = new JLabel("Speed X");
 		lblSpeedX.setBounds(12, 173, 63, 31);
 		panelObject.add(lblSpeedX);
 		lblSpeedX.setFont(new Font("Lato", Font.BOLD, 15));
@@ -235,7 +280,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		spinnerSpeedX.setBounds(72, 175, 76, 26);
 		panelObject.add(spinnerSpeedX);
 
-		JLabel lblSpeedY = new JLabel("Speed Y");
+		lblSpeedY = new JLabel("Speed Y");
 		lblSpeedY.setBounds(151, 175, 67, 26);
 		panelObject.add(lblSpeedY);
 		lblSpeedY.setFont(new Font("Lato", Font.BOLD, 15));
@@ -244,7 +289,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		spinnerSpeedY.setBounds(211, 175, 76, 26);
 		panelObject.add(spinnerSpeedY);
 
-		JLabel lblRefreshMove = new JLabel("Refresh Move (ms)");
+		lblRefreshMove = new JLabel("Refresh Move (ms)");
 		lblRefreshMove.setBounds(6, 210, 117, 31);
 		panelObject.add(lblRefreshMove);
 		lblRefreshMove.setHorizontalAlignment(SwingConstants.CENTER);
@@ -263,13 +308,13 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		});
 		spinnerRefreshMove.setModel(new SpinnerNumberModel(new Integer(10), new Integer(1), null, new Integer(1)));
 
-		JLabel lblWidth = new JLabel("Width");
+		lblWidth = new JLabel("Width");
 		lblWidth.setBounds(12, 108, 61, 26);
 		panelObject.add(lblWidth);
 		lblWidth.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWidth.setFont(new Font("Lato", Font.BOLD, 15));
 
-		JLabel lblHeight = new JLabel("Height");
+		lblHeight = new JLabel("Height");
 		lblHeight.setBounds(146, 110, 67, 22);
 		panelObject.add(lblHeight);
 		lblHeight.setHorizontalAlignment(SwingConstants.CENTER);
@@ -302,13 +347,13 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		});
 		spinnerHeight.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
 
-		JLabel lblNoSkinFound = new JLabel("No skin found!");
+		lblNoSkinFound = new JLabel("No skin found!");
 		lblNoSkinFound.setBounds(6, 48, 300, 15);
 		panelObject.add(lblNoSkinFound);
 		lblNoSkinFound.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNoSkinFound.setFont(new Font("Lato", Font.BOLD, 12));
 
-		JButton btnUploadSkin = new JButton("Add Skin");
+		btnUploadSkin = new JButton("Add Skin");
 		btnUploadSkin.setBounds(35, 67, 239, 31);
 		panelObject.add(btnUploadSkin);
 
@@ -347,21 +392,21 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		});
 		spinnerPosX.getModel().setValue(window.getApp().getObject().getX());
 
-		JPanel panelAnimation = new JPanel();
-		springLayout.putConstraint(SpringLayout.NORTH, panelAnimation, 587, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.WEST, panelAnimation, 1, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, panelAnimation, 746, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.EAST, panelAnimation, 307, SpringLayout.WEST, this);
+		panelAnimation = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelAnimation, 587, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.WEST, panelAnimation, 1, SpringLayout.WEST, this);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelAnimation, 746, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.EAST, panelAnimation, 307, SpringLayout.WEST, this);
 		aux.add(panelAnimation);
 		panelAnimation.setLayout(null);
 
-		JLabel lblAnimation = new JLabel("Animation");
+		lblAnimation = new JLabel("Animation");
 		lblAnimation.setBounds(93, 6, 133, 43);
 		panelAnimation.add(lblAnimation);
 		lblAnimation.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAnimation.setFont(new Font("Lato", Font.BOLD, 25));
 
-		JLabel lblTimeRefresh = new JLabel("Time Refresh (ms)");
+		lblTimeRefresh = new JLabel("Time Refresh (ms)");
 		lblTimeRefresh.setBounds(6, 51, 122, 31);
 		panelAnimation.add(lblTimeRefresh);
 		lblTimeRefresh.setHorizontalAlignment(SwingConstants.CENTER);
@@ -381,7 +426,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		separator_1_1.setBounds(0, 157, 326, 2);
 		panelAnimation.add(separator_1_1);
 
-		JLabel lblPlayPause = new JLabel("");
+		lblPlayPause = new JLabel("");
 		lblPlayPause.setBounds(239, 9, 40, 40);
 		panelAnimation.add(lblPlayPause);
 		lblPlayPause.addMouseListener(new MouseAdapter() {
@@ -397,7 +442,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 				Image.SCALE_SMOOTH);
 		lblPlayPause.setIcon(new ImageIcon(myIconPlay));
 
-		JLabel lblDelay = new JLabel("Delay");
+		lblDelay = new JLabel("Delay");
 		lblDelay.setBounds(6, 80, 122, 28);
 		panelAnimation.add(lblDelay);
 		lblDelay.setHorizontalAlignment(SwingConstants.CENTER);
@@ -408,7 +453,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		panelAnimation.add(spinnerDelay);
 		spinnerDelay.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
 
-		JButton btnAddAnimation = new JButton("Add Animation to Object");
+		btnAddAnimation = new JButton("Add Animation to Object");
 		btnAddAnimation.setBounds(70, 120, 190, 31);
 		panelAnimation.add(btnAddAnimation);
 		btnAddAnimation.addActionListener(new ActionListener() {
@@ -453,30 +498,36 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 			}
 		});
 
-		JPanel panelOptions = new JPanel();
-		springLayout.putConstraint(SpringLayout.NORTH, panelOptions, 0, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.WEST, panelOptions, 1, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, panelOptions, 176, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.EAST, panelOptions, 309, SpringLayout.WEST, this);
+		panelOptions = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelOptions, 0, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.WEST, panelOptions, 1, SpringLayout.WEST, this);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelOptions, 176, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.EAST, panelOptions, 309, SpringLayout.WEST, this);
 		aux.add(panelOptions);
 		panelOptions.setLayout(null);
 
-		JLabel lblOptions = new JLabel("Options");
+		lblOptions = new JLabel("Options");
 		lblOptions.setBounds(95, 4, 121, 37);
 		panelOptions.add(lblOptions);
 		lblOptions.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOptions.setFont(new Font("Lato", Font.BOLD, 25));
 
-		JButton btnSettings = new JButton("Settings");
+		btnSettings = new JButton("Settings");
+		btnSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				setDefaultTheme();
+			}
+		});
 		btnSettings.setBounds(60, 121, 190, 31);
 		panelOptions.add(btnSettings);
 
-		JButton btnCreateObject = new JButton("Create a new Object");
+		btnCreateObject = new JButton("Create a new Object");
 		btnCreateObject.setToolTipText("Create an object and add it to the canvas");
 		btnCreateObject.setBounds(60, 50, 190, 31);
 		panelOptions.add(btnCreateObject);
 
-		JButton btnMyObjects = new JButton("My Objects");
+		btnMyObjects = new JButton("My Objects");
 		btnMyObjects.setToolTipText("Shows the list of all the objects created");
 		btnMyObjects.setBounds(60, 85, 190, 31);
 		panelOptions.add(btnMyObjects);
@@ -485,7 +536,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		separator_1_1_2.setBounds(-18, 164, 326, 2);
 		panelOptions.add(separator_1_1_2);
 
-		JButton btnFullScreen = new JButton("");
+		btnFullScreen = new JButton("");
 		btnFullScreen.setToolTipText("Exit FullScreen Mode");
 		btnFullScreen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -550,46 +601,181 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		});
 
 		add(aux);
-		
-		JPanel panelCanvas = new JPanel();
-		springLayout.putConstraint(SpringLayout.NORTH, panelCanvas, 3, SpringLayout.SOUTH, panelAnimation);
-		springLayout.putConstraint(SpringLayout.WEST, panelCanvas, 1, SpringLayout.WEST, aux);
-		springLayout.putConstraint(SpringLayout.SOUTH, panelCanvas, 162, SpringLayout.SOUTH, panelAnimation);
-		springLayout.putConstraint(SpringLayout.EAST, panelCanvas, 0, SpringLayout.EAST, panelSpriteSheet);
+
+		panelCanvas = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelCanvas, 3, SpringLayout.SOUTH, panelAnimation);
+		sl_aux.putConstraint(SpringLayout.WEST, panelCanvas, 1, SpringLayout.WEST, aux);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelCanvas, 162, SpringLayout.SOUTH, panelAnimation);
+		sl_aux.putConstraint(SpringLayout.EAST, panelCanvas, 0, SpringLayout.EAST, panelSpriteSheet);
 		aux.add(panelCanvas);
 		SpringLayout sl_panelCanvas = new SpringLayout();
 		panelCanvas.setLayout(sl_panelCanvas);
-		
-		JLabel lblCanvas = new JLabel("Canvas");
+
+		lblCanvas = new JLabel("Canvas");
 		sl_panelCanvas.putConstraint(SpringLayout.NORTH, lblCanvas, 10, SpringLayout.NORTH, panelCanvas);
 		sl_panelCanvas.putConstraint(SpringLayout.WEST, lblCanvas, -215, SpringLayout.EAST, panelCanvas);
 		sl_panelCanvas.putConstraint(SpringLayout.EAST, lblCanvas, -84, SpringLayout.EAST, panelCanvas);
 		lblCanvas.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCanvas.setFont(new Font("Lato", Font.BOLD, 25));
 		panelCanvas.add(lblCanvas);
-		
-		JButton btnCanvasColor = new JButton("Background Color");
+
+		btnCanvasColor = new JButton("Select a Color");
+		sl_panelCanvas.putConstraint(SpringLayout.NORTH, btnCanvasColor, 7, SpringLayout.SOUTH, lblCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.WEST, btnCanvasColor, 157, SpringLayout.WEST, panelCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.SOUTH, btnCanvasColor, -83, SpringLayout.SOUTH, panelCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.EAST, btnCanvasColor, -10, SpringLayout.EAST, panelCanvas);
 		btnCanvasColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+
 				JColorChooser colorChooser = new JColorChooser();
-				
+				JButton btnChooseColor = new JButton("Pick this Color");
+
+				JDialog dialogColor = new JDialog(window, "Canvas Color");
+				dialogColor.getContentPane().setLayout(new BorderLayout());
+				dialogColor.getContentPane().add(colorChooser, BorderLayout.CENTER);
+				dialogColor.getContentPane().add(btnChooseColor, BorderLayout.SOUTH);
+				dialogColor.setLocationRelativeTo(null);
+				dialogColor.pack();
+				dialogColor.setVisible(true);
+
 				colorChooser.isVisible();
-				
+
+				btnChooseColor.addActionListener(a -> {
+
+					// Setting canvas color
+
+					window.getCanvas().setBackground(colorChooser.getColor());
+					btnCanvasColor.setBackground(colorChooser.getColor());
+
+					dialogColor.dispose();
+
+				});
+
 			}
 		});
 		btnCanvasColor.setBackground(new Color(255, 255, 255));
-		sl_panelCanvas.putConstraint(SpringLayout.NORTH, btnCanvasColor, 7, SpringLayout.SOUTH, lblCanvas);
-		sl_panelCanvas.putConstraint(SpringLayout.WEST, btnCanvasColor, 53, SpringLayout.WEST, panelCanvas);
-		sl_panelCanvas.putConstraint(SpringLayout.EAST, btnCanvasColor, -44, SpringLayout.EAST, panelCanvas);
 		panelCanvas.add(btnCanvasColor);
-		
-		JButton btnBackgroundImage = new JButton("Background Image");
+
+		btnBackgroundImage = new JButton("Add an Image");
+		btnBackgroundImage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				setDarkMode();
+
+			}
+		});
 		sl_panelCanvas.putConstraint(SpringLayout.NORTH, btnBackgroundImage, 6, SpringLayout.SOUTH, btnCanvasColor);
-		sl_panelCanvas.putConstraint(SpringLayout.WEST, btnBackgroundImage, 0, SpringLayout.WEST, btnCanvasColor);
+		sl_panelCanvas.putConstraint(SpringLayout.WEST, btnBackgroundImage, 157, SpringLayout.WEST, panelCanvas);
 		sl_panelCanvas.putConstraint(SpringLayout.EAST, btnBackgroundImage, 0, SpringLayout.EAST, btnCanvasColor);
 		panelCanvas.add(btnBackgroundImage);
 
+		lblBackgroundColor = new JLabel("Background Color");
+		lblBackgroundColor.setFont(new Font("Lato", Font.BOLD, 13));
+		lblBackgroundColor.setHorizontalAlignment(SwingConstants.CENTER);
+		sl_panelCanvas.putConstraint(SpringLayout.NORTH, lblBackgroundColor, 0, SpringLayout.NORTH, btnCanvasColor);
+		sl_panelCanvas.putConstraint(SpringLayout.WEST, lblBackgroundColor, 10, SpringLayout.WEST, panelCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.SOUTH, lblBackgroundColor, 0, SpringLayout.SOUTH, btnCanvasColor);
+		sl_panelCanvas.putConstraint(SpringLayout.EAST, lblBackgroundColor, -26, SpringLayout.WEST, btnCanvasColor);
+		panelCanvas.add(lblBackgroundColor);
+
+		lblBackgroundImage = new JLabel("Background Image");
+		sl_panelCanvas.putConstraint(SpringLayout.NORTH, lblBackgroundImage, 6, SpringLayout.NORTH, btnBackgroundImage);
+		sl_panelCanvas.putConstraint(SpringLayout.WEST, lblBackgroundImage, 0, SpringLayout.WEST, lblBackgroundColor);
+		sl_panelCanvas.putConstraint(SpringLayout.EAST, lblBackgroundImage, 0, SpringLayout.EAST, lblBackgroundColor);
+		lblBackgroundImage.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBackgroundImage.setFont(new Font("Lato", Font.BOLD, 13));
+		panelCanvas.add(lblBackgroundImage);
+
+	}
+
+	private void addPanelsToList() {
+
+		myPanels.add(aux);
+		myPanels.add(panelAnimation);
+		myPanels.add(panelCanvas);
+		myPanels.add(panelObject);
+		myPanels.add(panelOptions);
+		myPanels.add(panelSpriteSheet);
+
+	}
+
+	public void setDarkMode() {
+
+		for (int i = 0; i < myPanels.size(); i++) {
+
+			JPanel temp = myPanels.get(i);
+
+			temp.setBackground(new Color(75, 75, 75));
+
+			for (int j = 0; j < temp.getComponents().length; j++) {
+
+				if (temp.getComponent(j) instanceof JLabel) {
+
+					temp.getComponent(j).setForeground(Color.WHITE);
+
+				}
+
+				if (temp.getComponent(j) instanceof JButton) {
+
+					temp.getComponent(j).setBackground(Color.BLACK);
+					temp.getComponent(j).setForeground(Color.WHITE);
+
+				}
+
+			}
+
+		}
+
+		BufferedImage fsWhite = ImageLoader.cargarSprites("images/fullScreenWhite.png");
+		Image fsIconWhite = fsWhite.getScaledInstance(btnFullScreen.getWidth() - 10, btnFullScreen.getHeight() - 10,
+				Image.SCALE_SMOOTH);
+		btnFullScreen.setIcon(new ImageIcon(fsIconWhite));
+
+		BufferedImage playWhite = ImageLoader.cargarSprites("images/playpauseWhite.png");
+		Image playIconWhite = playWhite.getScaledInstance(lblPlayPause.getWidth(), lblPlayPause.getHeight(),
+				Image.SCALE_SMOOTH);
+		lblPlayPause.setIcon(new ImageIcon(playIconWhite));
+
+	}
+	
+	public void setDefaultTheme() {
+		
+		for (int i = 0; i < myPanels.size(); i++) {
+
+			JPanel temp = myPanels.get(i);
+
+			temp.setBackground(null);
+
+			for (int j = 0; j < temp.getComponents().length; j++) {
+
+				if (temp.getComponent(j) instanceof JLabel) {
+
+					temp.getComponent(j).setForeground(Color.BLACK);
+
+				}
+
+				if (temp.getComponent(j) instanceof JButton) {
+
+					temp.getComponent(j).setBackground(null);
+					temp.getComponent(j).setForeground(Color.BLACK);
+
+				}
+
+			}
+
+		}
+
+		BufferedImage fs = ImageLoader.cargarSprites("images/fullScreen.png");
+		Image fsIcon = fs.getScaledInstance(btnFullScreen.getWidth() - 10, btnFullScreen.getHeight() - 10,
+				Image.SCALE_SMOOTH);
+		btnFullScreen.setIcon(new ImageIcon(fsIcon));
+
+		BufferedImage play = ImageLoader.cargarSprites("images/playpause.png");
+		Image playIcon = play.getScaledInstance(lblPlayPause.getWidth(), lblPlayPause.getHeight(),
+				Image.SCALE_SMOOTH);
+		lblPlayPause.setIcon(new ImageIcon(playIcon));
+		
+		
 	}
 
 	public JLabel getLabSpriteTextFile() {
@@ -736,5 +922,149 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 		window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
+	}
+
+	public JButton getBtnCreateObject() {
+		return btnCreateObject;
+	}
+
+	public JLabel getLblOptions() {
+		return lblOptions;
+	}
+
+	public JButton getBtnAddAnimation() {
+		return btnAddAnimation;
+	}
+
+	public JButton getBtnFullScreen() {
+		return btnFullScreen;
+	}
+
+	public JButton getBtnAddSprite() {
+		return btnAddSprite;
+	}
+
+	public JButton getBtnMyObjects() {
+		return btnMyObjects;
+	}
+
+	public JButton getBtnBackgroundImage() {
+		return btnBackgroundImage;
+	}
+
+	public JButton getBtnUploadSkin() {
+		return btnUploadSkin;
+	}
+
+	public JButton getBtnSettings() {
+		return btnSettings;
+	}
+
+	public JButton getBtnCanvasColor() {
+		return btnCanvasColor;
+	}
+
+	public JLabel getLblPosX() {
+		return lblPosX;
+	}
+
+	public JLabel getLblDelay() {
+		return lblDelay;
+	}
+
+	public JLabel getLblBackgroundImage() {
+		return lblBackgroundImage;
+	}
+
+	public JLabel getLblNumSprites() {
+		return lblNumSprites;
+	}
+
+	public JLabel getLblAnimation() {
+		return lblAnimation;
+	}
+
+	public JLabel getLblSpeedX() {
+		return lblSpeedX;
+	}
+
+	public JLabel getLblRefreshMove() {
+		return lblRefreshMove;
+	}
+
+	public JLabel getLblCanvas() {
+		return lblCanvas;
+	}
+
+	public JLabel getLblPosY() {
+		return lblPosY;
+	}
+
+	public JLabel getLblNoSkinFound() {
+		return lblNoSkinFound;
+	}
+
+	public JLabel getLblPlayPause() {
+		return lblPlayPause;
+	}
+
+	public JLabel getLblHeight() {
+		return lblHeight;
+	}
+
+	public JLabel getLblCols() {
+		return lblCols;
+	}
+
+	public JLabel getLblWidth() {
+		return lblWidth;
+	}
+
+	public JLabel getLblRows() {
+		return lblRows;
+	}
+
+	public JLabel getLblObject() {
+		return lblObject;
+	}
+
+	public JLabel getLblTimeRefresh() {
+		return lblTimeRefresh;
+	}
+
+	public JLabel getLblBackgroundColor() {
+		return lblBackgroundColor;
+	}
+
+	public JLabel getLblSprite() {
+		return lblSprite;
+	}
+
+	public JLabel getLblSpeedY() {
+		return lblSpeedY;
+	}
+
+	public JPanel getPanelOptions() {
+		return panelOptions;
+	}
+
+	public JPanel getPanelAnimation() {
+		return panelAnimation;
+	}
+
+	public JPanel getPanelCanvas() {
+		return panelCanvas;
+	}
+
+	public JPanel getPanelSpriteSheet() {
+		return panelSpriteSheet;
+	}
+
+	public JPanel getPanelObject() {
+		return panelObject;
+	}
+
+	public JPanel getAux() {
+		return aux;
 	}
 }

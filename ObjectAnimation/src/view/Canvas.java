@@ -28,7 +28,7 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 	
 
 	public Canvas(MainWindow window) {
-		setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
+		setBorder(new LineBorder(Color.DARK_GRAY, 0, true));
 
 		this.window = window;
 		setLayout(null);
