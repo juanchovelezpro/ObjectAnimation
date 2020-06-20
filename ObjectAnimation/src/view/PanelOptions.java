@@ -526,6 +526,28 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 			public void actionPerformed(ActionEvent arg0) {
 
 				// Open Settings
+				JDialog settings = new JDialog(window, "Settings");
+
+				settings.getContentPane().setLayout(new GridLayout(1, 3));
+				JLabel lblTheme = new JLabel("Theme");
+				JButton btnDefault = new JButton("Default");
+				btnDefault.addActionListener(a -> {
+
+					setDefaultTheme();
+
+				});
+				JButton btnDark = new JButton("Dark");
+				btnDark.addActionListener(a -> {
+
+					setDarkMode();
+
+				});
+				settings.getContentPane().add(lblTheme);
+				settings.getContentPane().add(btnDefault);
+				settings.getContentPane().add(btnDark);
+				settings.pack();
+				settings.setLocationRelativeTo(null);
+				settings.setVisible(true);
 
 			}
 		});
@@ -642,11 +664,12 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 				JDialog dialogColor = new JDialog(window, "Canvas Color");
 				dialogColor.getContentPane().setLayout(new BorderLayout());
-				dialogColor.setLocationRelativeTo(null);
+
 				dialogColor.getContentPane().add(colorChooser, BorderLayout.CENTER);
 				dialogColor.getContentPane().add(btnChooseColor, BorderLayout.SOUTH);
 
 				dialogColor.pack();
+				dialogColor.setLocationRelativeTo(null);
 				dialogColor.setVisible(true);
 
 				colorChooser.isVisible();
