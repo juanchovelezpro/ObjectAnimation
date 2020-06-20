@@ -2,6 +2,8 @@ package animation;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
+
 import model.Object;
 import threads.AnimationThread;
 
@@ -11,7 +13,12 @@ import threads.AnimationThread;
  * @author Juan Camilo Vélez Olaya
  *
  */
-public class Animation {
+public class Animation implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * The speed of the animation
@@ -46,17 +53,17 @@ public class Animation {
 	/**
 	 * It is the image to get the sprite sheets.
 	 */
-	private BufferedImage image;
+	private transient BufferedImage image;
 
 	/**
 	 * It is an array of the sub images (sprites)
 	 */
-	private BufferedImage[] images;
+	private transient BufferedImage[] images;
 
 	/**
 	 * It is the current sprite for the animation.
 	 */
-	private BufferedImage currentImage;
+	private transient BufferedImage currentImage;
 
 	/**
 	 * Variable to know if the animation has finished.

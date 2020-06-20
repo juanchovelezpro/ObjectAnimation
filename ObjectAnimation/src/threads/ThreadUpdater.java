@@ -3,7 +3,7 @@ package threads;
 import view.MainWindow;
 import view.PanelOptions;
 
-public class ThreadUpdater extends Thread {
+public class ThreadUpdater extends Thread{
 
 	private MainWindow window;
 

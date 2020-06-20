@@ -1,9 +1,15 @@
 package threads;
 
+import java.io.Serializable;
+
 import animation.Animation;
 
-public class AnimationThread extends Thread {
+public class AnimationThread extends Thread implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Animation animation;
 
 	public AnimationThread(Animation animation) {

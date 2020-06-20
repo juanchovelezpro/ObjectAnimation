@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
  * @author Juan Camilo Vélez Olaya
  *
  */
-public class SpriteSheet {
+public class SpriteSheet{
 
 	/**
 	 * This is the image to get sprite sheets

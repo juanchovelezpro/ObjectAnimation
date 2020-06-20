@@ -3,12 +3,18 @@ package model;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import animation.Animation;
 import view.Canvas;
 
-public class Object extends Thread implements Comparable<Object> {
+public class Object extends Thread implements Comparable<Object>, Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	private ArrayList<Animation> animations;
 
@@ -19,11 +25,11 @@ public class Object extends Thread implements Comparable<Object> {
 	private int speedY;
 	private int width;
 	private int height;
-	private Image skin;
+	private transient Image skin;
 	private String skinPath;
 	private int refreshMove;
 	private Animation animation;
-	private Application app;
+	private transient Application app;
 
 	public Object(Application app) {
 

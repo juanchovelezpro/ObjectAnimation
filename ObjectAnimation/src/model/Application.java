@@ -2,24 +2,32 @@ package model;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.swing.JOptionPane;
+
+import com.sun.javafx.runtime.SystemProperties;
+
 import view.MainWindow;
 
-public class Application {
+public class Application implements Serializable {
 
 	private ArrayList<Object> myObjects;
 
 	private Object object;
 	private Object currentObject;
-
 	private BufferedImage currentSprite;
-	private MainWindow window;
 
-	public Application(MainWindow window) {
+	public Application() {
 
-		this.window = window;
 		object = new Object(this);
 		currentObject = object;
 		currentSprite = null;
@@ -91,6 +99,112 @@ public class Application {
 		this.myObjects = myObjects;
 	}
 
+	public void save() {
+
+		FileOutputStream fS = null;
+		ObjectOutputStream oS = null;
+		ArrayList<Object> objects = myObjects;
+
+		try {
+
+			String userDir = System.getProperty("user.dir");
+			File folderData = new File(userDir + "/ObjectAnimationFiles/data");
+			folderData.mkdirs();
+
+			fS = new FileOutputStream(folderData.getAbsolutePath() + "/app.dat", false);
+			oS = new ObjectOutputStream(fS);
+
+			oS.writeObject(objects);
+
+		} catch (FileNotFoundException ex) {
+
+			System.out.println(ex.getMessage());
+
+		} catch (IOException ex) {
+
+			System.out.println(ex.getMessage());
+
+		} finally {
+
+			try {
+
+				if (objects != null) {
+
+					fS.close();
+
+				}
+				if (oS != null) {
+
+					oS.close();
+
+				}
+
+			} catch (IOException ex) {
+
+				System.out.println(ex.getMessage());
+
+			}
+		}
+
+	}
+
+	public void read() {
+
+		FileInputStream fS = null;
+		ObjectInputStream oS = null;
+
+		ArrayList<Object> objects = null;
+
+		String userDir = System.getProperty("user.dir");
+		String fullPath = userDir + "/ObjectAnimationFiles/data/app.dat";
+		File verify = new File(fullPath);
+		if (verify.exists()) {
+
+			try {
+
+				fS = new FileInputStream(fullPath);
+				oS = new ObjectInputStream(fS);
+				objects = (ArrayList<Object>) oS.readObject();
+
+				myObjects = objects;
+
+			} catch (Exception ex) {
+
+				ex.printStackTrace();
+
+			} finally {
+
+				try {
+					if (fS != null) {
+						fS.close();
+					}
+					if (oS != null) {
+						oS.close();
+					}
+				} catch (IOException e) {
+
+					e.printStackTrace();
+
+				}
+
+			}
+
+			System.out.println("Reading Objects... \n" + myObjects);
+			initAllThreads();
+		}
+
+	}
+
+	public void initAllThreads() {
+
+		for (int i = 0; i < myObjects.size(); i++) {
+
+			myObjects.get(i).start();
+
+		}
+
+	}
+
 	public BufferedImage getCurrentSprite() {
 		return currentSprite;
 	}
@@ -105,14 +219,6 @@ public class Application {
 
 	public void setObject(Object object) {
 		this.object = object;
-	}
-
-	public MainWindow getWindow() {
-		return window;
-	}
-
-	public void setWindow(MainWindow window) {
-		this.window = window;
 	}
 
 	public Object getCurrentObject() {
