@@ -55,5 +55,40 @@ public class ImageLoader {
 		return bimage;
 
 	}
+	
+	
+	public static double getScaleFactor(int original, int target) {
+		
+		double scale = 1d;
+
+			scale = (double)target/(double)original;
+
+		return scale;
+		
+	}
+	
+	
+	public static Image resizeToFit(BufferedImage toResize, Dimension target) {
+		
+		Image resized = null;
+		
+		double scale = 1d;
+		
+		double scaleWidth = getScaleFactor(toResize.getWidth(), (int)target.getWidth());
+		double scaleHeight = getScaleFactor(toResize.getHeight(), (int)target.getHeight());
+		
+		scale = Math.min(scaleWidth, scaleHeight);
+		
+		double scaleFactor = Math.min(1d, scale);
+		
+		int scaleWidthDef = (int)Math.round(toResize.getWidth()*scaleFactor);
+		int scaleHeightDef = (int)Math.round(toResize.getHeight()*scaleFactor);
+		
+		
+		resized = toResize.getScaledInstance(scaleWidthDef, scaleHeightDef, Image.SCALE_SMOOTH);		
+		
+		return resized;
+		
+	}
 
 }

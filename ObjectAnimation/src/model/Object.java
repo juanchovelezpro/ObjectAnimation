@@ -19,7 +19,8 @@ public class Object extends Thread implements Comparable<Object> {
 	private int speedY;
 	private int width;
 	private int height;
-	private Image sprite;
+	private Image skin;
+	private String skinPath;
 	private int refreshMove;
 	private Animation animation;
 	private Application app;
@@ -34,7 +35,8 @@ public class Object extends Thread implements Comparable<Object> {
 		height = 100;
 		x = Canvas.WIDTH / 2 - width / 2;
 		y = Canvas.HEIGHT / 2 - height / 2;
-		sprite = null;
+		skin = null;
+		skinPath = "";
 		refreshMove = 10;
 		animation = null;
 
@@ -97,6 +99,14 @@ public class Object extends Thread implements Comparable<Object> {
 		this.app = app;
 	}
 
+	public String getSkinPath() {
+		return skinPath;
+	}
+
+	public void setSkinPath(String skinPath) {
+		this.skinPath = skinPath;
+	}
+
 	public int getWidth() {
 		return width;
 	}
@@ -138,8 +148,8 @@ public class Object extends Thread implements Comparable<Object> {
 
 	public void render(Graphics g) {
 
-		if (sprite != null)
-			g.drawImage(sprite, x, y, null);
+		if (skin != null)
+			g.drawImage(skin, x, y, null);
 		else
 			g.drawRect(x, y, width, height);
 
@@ -180,12 +190,12 @@ public class Object extends Thread implements Comparable<Object> {
 		this.speedY = speedY;
 	}
 
-	public Image getSprite() {
-		return sprite;
+	public Image getSkin() {
+		return skin;
 	}
 
-	public void setSprite(Image sprite) {
-		this.sprite = sprite;
+	public void setSkin(Image skin) {
+		this.skin = skin;
 	}
 
 	public int getRefreshMove() {

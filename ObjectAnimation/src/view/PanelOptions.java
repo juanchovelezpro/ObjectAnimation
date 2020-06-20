@@ -49,6 +49,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 	private MainWindow window;
 
 	private File fileSelectedSprite;
+	private File fileSelectedSkin;
 	private File backgroundImageCanvas;
 	private JLabel labNoSprites;
 	private JSpinner spinnerRows;
@@ -224,8 +225,10 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 					// Resized image to the Dialog
 
-					JOptionPane.showMessageDialog(null, "The Sprite has been uploaded successfully", "Sprite Uploaded",
-							JOptionPane.INFORMATION_MESSAGE, new ImageIcon(sprite));
+					Image resized = ImageLoader.resizeToFit(sprite, new Dimension(250,250));
+					
+					JOptionPane.showMessageDialog(window, "The Sprite has been uploaded successfully", "Sprite Uploaded",
+							JOptionPane.INFORMATION_MESSAGE, new ImageIcon(resized));
 
 				}
 
@@ -354,6 +357,38 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		lblCurrentObject.setFont(new Font("Lato", Font.BOLD, 12));
 
 		btnUploadSkin = new JButton("Add Skin");
+		btnUploadSkin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				// Adding a skin to the object
+				
+				JFileChooser chooser = new JFileChooser();
+				chooser.showDialog(window, "Add Skin to Object");
+
+				String pathImage = "";
+				BufferedImage skin = null;
+
+				try {
+
+					if (chooser.getSelectedFile() != null) {
+						fileSelectedSkin = chooser.getSelectedFile();
+						pathImage = fileSelectedSkin.getAbsolutePath();
+						skin = ImageIO.read(new File(pathImage));
+						
+						
+						window.getApp().getCurrentObject().setSkin(skin);
+						
+
+					}
+
+				} catch (Exception ex) {
+
+					ex.printStackTrace();
+
+				}
+				
+			}
+		});
 		btnUploadSkin.setBounds(35, 67, 239, 31);
 		panelObject.add(btnUploadSkin);
 

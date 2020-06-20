@@ -14,7 +14,6 @@ public class Application {
 	private Object object;
 	private Object currentObject;
 
-	private int speedAnimation;
 	private BufferedImage currentSprite;
 	private MainWindow window;
 
@@ -23,7 +22,6 @@ public class Application {
 		this.window = window;
 		object = new Object(this);
 		currentObject = object;
-		speedAnimation = 0;
 		currentSprite = null;
 
 		myObjects = new ArrayList<>();
@@ -35,18 +33,17 @@ public class Application {
 		object.setNameID(idName);
 
 		if (myObjects.isEmpty()) {
-			
-			currentObject = object;			
-			
+
+			currentObject = object;
+
 			myObjects.add(object);
 
 			String dir = System.getProperty("user.dir");
 
 			File objectFolder = new File(dir + "/ObjectAnimationFiles/MyObjects/" + idName);
 			objectFolder.mkdirs();
-		
+
 			object = new Object(this);
-			
 
 		} else {
 
@@ -60,16 +57,15 @@ public class Application {
 			} else {
 
 				currentObject = object;
-				
+
 				myObjects.add(Math.abs(index) - 1, object);
 
 				String dir = System.getProperty("user.dir");
 
 				File objectFolder = new File(dir + "/ObjectAnimationFiles/MyObjects/" + idName);
 				objectFolder.mkdirs();
-				
+
 				object = new Object(this);
-				
 
 			}
 
@@ -101,14 +97,6 @@ public class Application {
 
 	public void setCurrentSprite(BufferedImage currentSprite) {
 		this.currentSprite = currentSprite;
-	}
-
-	public int getSpeedAnimation() {
-		return speedAnimation;
-	}
-
-	public void setSpeedAnimation(int speedAnimation) {
-		this.speedAnimation = speedAnimation;
 	}
 
 	public Object getObject() {
