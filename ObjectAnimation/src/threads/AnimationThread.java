@@ -19,9 +19,19 @@ public class AnimationThread extends Thread {
 
 			try {
 
-				sleep(animation.getTimeRefresh());
+				if (!animation.isPause()) {
+					sleep(animation.getTimeRefresh());
 
-				animation.runAnimation();
+					animation.runAnimation();
+				} else {
+
+					synchronized (this) {
+
+						wait();
+
+					}
+
+				}
 
 			} catch (Exception ex) {
 
@@ -31,6 +41,11 @@ public class AnimationThread extends Thread {
 
 		}
 
+	}
+
+	public synchronized void resumeAnimation() {
+
+		notify();
 	}
 
 }

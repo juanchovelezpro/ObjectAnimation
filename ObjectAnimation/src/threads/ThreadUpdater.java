@@ -16,12 +16,11 @@ public class ThreadUpdater extends Thread {
 
 		PanelOptions options = window.getOptions();
 
-		if(window.getApp().getCurrentObject().getSpeedX() != 0)
-		options.getSpinnerPosX().setValue(window.getApp().getCurrentObject().getX());
-		
-		if(window.getApp().getCurrentObject().getSpeedY() != 0)
-		options.getSpinnerPosY().setValue(window.getApp().getCurrentObject().getY());
+		if (window.getApp().getCurrentObject().getSpeedX() != 0)
+			options.getSpinnerPosX().setValue(window.getApp().getCurrentObject().getX());
 
+		if (window.getApp().getCurrentObject().getSpeedY() != 0)
+			options.getSpinnerPosY().setValue(window.getApp().getCurrentObject().getY());
 
 	}
 
@@ -31,12 +30,15 @@ public class ThreadUpdater extends Thread {
 		while (true) {
 
 			updateObjectParameters();
-			
-			int refresh = Integer.parseInt(window.getOptions().getSpinnerTimeRefresh().getModel().getValue().toString());
-			
-			if(window.getApp().getCurrentObject().getAnimation()!=null)
-			window.getApp().getCurrentObject().getAnimation().setTimeRefresh(refresh);
-			
+
+			int refresh = Integer
+					.parseInt(window.getOptions().getSpinnerTimeRefresh().getModel().getValue().toString());
+
+			if (refresh != 1) {
+				if (window.getApp().getCurrentObject().getAnimation() != null)
+					window.getApp().getCurrentObject().getAnimation().setTimeRefresh(refresh);
+			}
+
 		}
 
 	}

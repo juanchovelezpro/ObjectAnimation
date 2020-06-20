@@ -115,9 +115,6 @@ public class Object extends Thread implements Comparable<Object> {
 
 	public void move() {
 
-		x += speedX;
-		y += speedY;
-
 		if (x >= Canvas.WIDTH - width || x <= 0) {
 
 			speedX *= -1;
@@ -129,6 +126,9 @@ public class Object extends Thread implements Comparable<Object> {
 			speedY *= -1;
 
 		}
+
+		x += speedX;
+		y += speedY;
 
 	}
 
@@ -238,12 +238,12 @@ public class Object extends Thread implements Comparable<Object> {
 		}
 
 	}
-	
+
 	@Override
-	public String toString(){
-		
-		return "ID NAME:" + nameID+ ", X: "+x;
-		
+	public String toString() {
+
+		return "ID NAME:" + nameID + ", X: " + x;
+
 	}
 
 }

@@ -3,8 +3,7 @@ package view;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -15,29 +14,24 @@ import javax.swing.border.LineBorder;
 
 import model.Object;
 
-
-public class Canvas extends JPanel implements MouseMotionListener, MouseListener{
+public class Canvas extends JPanel implements MouseMotionListener, MouseListener {
 
 	public static final int WIDTH = MainWindow.WIDTH - PanelOptions.WIDTH;
 	public static final int HEIGHT = MainWindow.HEIGHT;
 
 	private MainWindow window;
-	
-	private Color colorBackground;
 
-	
+	private Image backgroundImage;
 
 	public Canvas(MainWindow window) {
-		setBorder(new LineBorder(Color.DARK_GRAY, 0, true));
+		setBorder(new LineBorder(Color.DARK_GRAY, 2, true));
 
 		this.window = window;
 		setLayout(null);
 		setBackground(Color.WHITE);
 		setSize(WIDTH, HEIGHT);
-		setLocation(0, 5);
+		setLocation(0, 0);
 
-	
-		
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
@@ -48,10 +42,21 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 
 		super.paintComponent(g);
 
+		if (backgroundImage != null)
+			g.drawImage(backgroundImage, 0, 0, null);
+
 		renderObjects(g);
 
 		repaint();
 
+	}
+
+	public Image getBackgroundImage() {
+		return backgroundImage;
+	}
+
+	public void setBackgroundImage(Image backgroundImage) {
+		this.backgroundImage = backgroundImage;
 	}
 
 	public void renderObjects(Graphics g) {
@@ -71,8 +76,6 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 	@Override
 	public void mouseClicked(MouseEvent e) {
 
-	
-
 	}
 
 	@Override
@@ -82,7 +85,6 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-
 
 	}
 
@@ -99,18 +101,19 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 					&& e.getY() <= temp.getY() + temp.getHeight()) {
 
 				window.getApp().setCurrentObject(temp);
+				window.getOptions().updateValues();
 				temp.setX(e.getX() - temp.getWidth() / 2);
 				temp.setY(e.getY() - temp.getHeight() / 2);
 
 			}
 
 		}
-		
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		
+
 		window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
 	}
@@ -119,29 +122,27 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 	public void mouseDragged(MouseEvent e) {
 
 		Object current = window.getApp().getCurrentObject();
-		
 
 		if (e.getX() >= current.getX() && e.getX() <= current.getX() + current.getWidth() && e.getY() >= current.getY()
 				&& e.getY() <= current.getY() + current.getHeight()) {
 
 			window.setCursor(new Cursor(Cursor.MOVE_CURSOR));
-			
+
 			current.setX(e.getX() - current.getWidth() / 2);
 			current.setY(e.getY() - current.getHeight() / 2);
 
 			window.getOptions().updateValues();
 
-		}else {
-			
+		} else {
+
 			window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			
+
 		}
 
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
-
 
 	}
 

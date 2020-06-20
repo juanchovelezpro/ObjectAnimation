@@ -49,7 +49,8 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 	private MainWindow window;
 	private ArrayList<JPanel> myPanels;
 
-	private File fileSelected;
+	private File fileSelectedSprite;
+	private File backgroundImageCanvas;
 	private JLabel labNoSprites;
 	private JSpinner spinnerRows;
 	private JSpinner spinnerCols;
@@ -85,7 +86,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 	private JLabel lblRefreshMove;
 	private JLabel lblCanvas;
 	private JLabel lblPosY;
-	private JLabel lblNoSkinFound;
+	private JLabel lblCurrentObject;
 	private JLabel lblPlayPause;
 	private JLabel lblHeight;
 	private JLabel lblCols;
@@ -211,7 +212,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 			// Adding a sprite sheet
 			JFileChooser chooser = new JFileChooser();
-			chooser.showDialog(null, "Upload Sprites");
+			chooser.showDialog(window, "Upload Sprites");
 
 			String pathImage = "";
 			BufferedImage sprite = null;
@@ -219,11 +220,11 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 			try {
 
 				if (chooser.getSelectedFile() != null) {
-					fileSelected = chooser.getSelectedFile();
-					pathImage = fileSelected.getAbsolutePath();
+					fileSelectedSprite = chooser.getSelectedFile();
+					pathImage = fileSelectedSprite.getAbsolutePath();
 					sprite = ImageIO.read(new File(pathImage));
 					window.getApp().setCurrentSprite(sprite);
-					labNoSprites.setText(fileSelected.getName());
+					labNoSprites.setText(fileSelectedSprite.getName());
 					JOptionPane.showMessageDialog(null, "The Sprite has been uploaded successfully", "Sprite Uploaded",
 							JOptionPane.INFORMATION_MESSAGE, new ImageIcon(sprite));
 
@@ -290,10 +291,10 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		panelObject.add(spinnerSpeedY);
 
 		lblRefreshMove = new JLabel("Refresh Move (ms)");
-		lblRefreshMove.setBounds(6, 210, 117, 31);
+		lblRefreshMove.setBounds(2, 210, 117, 31);
 		panelObject.add(lblRefreshMove);
 		lblRefreshMove.setHorizontalAlignment(SwingConstants.CENTER);
-		lblRefreshMove.setFont(new Font("Lato", Font.BOLD, 12));
+		lblRefreshMove.setFont(new Font("Lato", Font.BOLD, 13));
 
 		spinnerRefreshMove = new JSpinner();
 		spinnerRefreshMove.setBounds(116, 213, 174, 26);
@@ -347,11 +348,11 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		});
 		spinnerHeight.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
 
-		lblNoSkinFound = new JLabel("No skin found!");
-		lblNoSkinFound.setBounds(6, 48, 300, 15);
-		panelObject.add(lblNoSkinFound);
-		lblNoSkinFound.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNoSkinFound.setFont(new Font("Lato", Font.BOLD, 12));
+		lblCurrentObject = new JLabel("Current Object: null");
+		lblCurrentObject.setBounds(2, 48, 305, 15);
+		panelObject.add(lblCurrentObject);
+		lblCurrentObject.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCurrentObject.setFont(new Font("Lato", Font.BOLD, 12));
 
 		btnUploadSkin = new JButton("Add Skin");
 		btnUploadSkin.setBounds(35, 67, 239, 31);
@@ -431,10 +432,20 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		panelAnimation.add(lblPlayPause);
 		lblPlayPause.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent arg0) {
+			public void mousePressed(MouseEvent e) {
 
 				// Resume and pause current object's animation
+				Animation currentAnimation = window.getApp().getCurrentObject().getAnimation();
 
+				if (currentAnimation != null) {
+					if (!currentAnimation.isPause()) {
+						currentAnimation.setPause(true);
+					} else {
+						currentAnimation.setPause(false);
+						currentAnimation.getThread().resumeAnimation();
+					}
+
+				}
 			}
 		});
 		BufferedImage iconPlay = ImageLoader.cargarSprites("images/playpause.png");
@@ -478,8 +489,6 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 						window.getApp().getCurrentObject().getAnimation().getThread().start();
 
-//						spinnerTimeRefresh.getModel().setValue(window.getApp().getCurrentObject().getAnimation().getTimeRefresh());
-
 					} catch (Exception ex) {
 
 						JOptionPane.showMessageDialog(null, ex.getCause() + "\n" + ex.getLocalizedMessage()
@@ -515,8 +524,9 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		btnSettings = new JButton("Settings");
 		btnSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				setDefaultTheme();
+
+				// Open Settings
+
 			}
 		});
 		btnSettings.setBounds(60, 121, 190, 31);
@@ -585,7 +595,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 				try {
 					if (name != null && !name.equalsIgnoreCase("")) {
 						window.getApp().addObject(name);
-						defaultValuesSpinners();
+						updateValues();
 					} else {
 						JOptionPane.showMessageDialog(null, "Please enter a name or the object it won't be added",
 								"Error", JOptionPane.ERROR_MESSAGE);
@@ -632,9 +642,10 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 				JDialog dialogColor = new JDialog(window, "Canvas Color");
 				dialogColor.getContentPane().setLayout(new BorderLayout());
+				dialogColor.setLocationRelativeTo(null);
 				dialogColor.getContentPane().add(colorChooser, BorderLayout.CENTER);
 				dialogColor.getContentPane().add(btnChooseColor, BorderLayout.SOUTH);
-				dialogColor.setLocationRelativeTo(null);
+
 				dialogColor.pack();
 				dialogColor.setVisible(true);
 
@@ -660,7 +671,29 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		btnBackgroundImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
-				setDarkMode();
+				// Adding background image to canvas
+
+				JFileChooser chooser = new JFileChooser();
+				chooser.showDialog(window, "Upload Background to Canvas");
+
+				String pathImage = "";
+				BufferedImage background = null;
+
+				try {
+
+					if (chooser.getSelectedFile() != null) {
+						backgroundImageCanvas = chooser.getSelectedFile();
+						pathImage = backgroundImageCanvas.getAbsolutePath();
+						background = ImageIO.read(new File(pathImage));
+						window.getCanvas().setBackgroundImage(background);
+
+					}
+
+				} catch (Exception ex) {
+
+					ex.printStackTrace();
+
+				}
 
 			}
 		});
@@ -737,9 +770,9 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		lblPlayPause.setIcon(new ImageIcon(playIconWhite));
 
 	}
-	
+
 	public void setDefaultTheme() {
-		
+
 		for (int i = 0; i < myPanels.size(); i++) {
 
 			JPanel temp = myPanels.get(i);
@@ -771,11 +804,9 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		btnFullScreen.setIcon(new ImageIcon(fsIcon));
 
 		BufferedImage play = ImageLoader.cargarSprites("images/playpause.png");
-		Image playIcon = play.getScaledInstance(lblPlayPause.getWidth(), lblPlayPause.getHeight(),
-				Image.SCALE_SMOOTH);
+		Image playIcon = play.getScaledInstance(lblPlayPause.getWidth(), lblPlayPause.getHeight(), Image.SCALE_SMOOTH);
 		lblPlayPause.setIcon(new ImageIcon(playIcon));
-		
-		
+
 	}
 
 	public JLabel getLabSpriteTextFile() {
@@ -826,37 +857,20 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		return spinnerHeight;
 	}
 
-	public File getFileSelected() {
-		return fileSelected;
+	public File getfileSelectedSprite() {
+		return fileSelectedSprite;
 	}
 
-	public void setFileSelected(File fileSelected) {
-		this.fileSelected = fileSelected;
-	}
-
-	public void defaultValuesSpinners() {
-
-		Object currentObject = window.getApp().getCurrentObject();
-
-		spinnerPosX.getModel().setValue(currentObject.getX());
-		spinnerPosY.getModel().setValue(currentObject.getY());
-		spinnerWidth.getModel().setValue(currentObject.getWidth());
-		spinnerHeight.getModel().setValue(currentObject.getHeight());
-		spinnerRefreshMove.getModel().setValue(currentObject.getRefreshMove());
-		spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
-		spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
-
-		if (currentObject.getAnimation() != null)
-			spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
-		else
-			spinnerTimeRefresh.getModel().setValue(1);
-
+	public void setfileSelectedSprite(File fileSelectedSprite) {
+		this.fileSelectedSprite = fileSelectedSprite;
 	}
 
 	public void updateValues() {
 
 		Object currentObject = window.getApp().getCurrentObject();
 
+		lblCurrentObject.setText("Current Object: " + currentObject.getNameID());
+
 		spinnerPosX.getModel().setValue(currentObject.getX());
 		spinnerPosY.getModel().setValue(currentObject.getY());
 		spinnerWidth.getModel().setValue(currentObject.getWidth());
@@ -865,11 +879,11 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
 		spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
 
-		if (currentObject.getAnimation() != null)
+		if (currentObject.getAnimation() != null) {
 			spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
-		else
+		} else {
 			spinnerTimeRefresh.getModel().setValue(1);
-
+		}
 	}
 
 	public JSpinner getSpinnerRefreshMove() {
@@ -1001,7 +1015,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 	}
 
 	public JLabel getLblNoSkinFound() {
-		return lblNoSkinFound;
+		return lblCurrentObject;
 	}
 
 	public JLabel getLblPlayPause() {
