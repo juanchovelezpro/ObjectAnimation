@@ -47,7 +47,6 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 	public static final int HEIGHT = MainWindow.HEIGHT * 4;
 
 	private MainWindow window;
-	private ArrayList<JPanel> myPanels;
 
 	private File fileSelectedSprite;
 	private File backgroundImageCanvas;
@@ -113,10 +112,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		setLocation(MainWindow.WIDTH - WIDTH, 0);
 
-		myPanels = new ArrayList<JPanel>();
-
 		settingComponents();
-		addPanelsToList();
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -225,6 +221,9 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 					sprite = ImageIO.read(new File(pathImage));
 					window.getApp().setCurrentSprite(sprite);
 					labNoSprites.setText(fileSelectedSprite.getName());
+
+					// Resized image to the Dialog
+
 					JOptionPane.showMessageDialog(null, "The Sprite has been uploaded successfully", "Sprite Uploaded",
 							JOptionPane.INFORMATION_MESSAGE, new ImageIcon(sprite));
 
@@ -744,22 +743,13 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 	}
 
-	private void addPanelsToList() {
-
-		myPanels.add(aux);
-		myPanels.add(panelAnimation);
-		myPanels.add(panelCanvas);
-		myPanels.add(panelObject);
-		myPanels.add(panelOptions);
-		myPanels.add(panelSpriteSheet);
-
-	}
-
 	public void setDarkMode() {
 
-		for (int i = 0; i < myPanels.size(); i++) {
+		aux.setBackground(new Color(75, 75, 75));
 
-			JPanel temp = myPanels.get(i);
+		for (int i = 0; i < aux.getComponentCount(); i++) {
+
+			JPanel temp = (JPanel) aux.getComponent(i);
 
 			temp.setBackground(new Color(75, 75, 75));
 
@@ -796,9 +786,11 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 	public void setDefaultTheme() {
 
-		for (int i = 0; i < myPanels.size(); i++) {
+		aux.setBackground(null);
 
-			JPanel temp = myPanels.get(i);
+		for (int i = 0; i < aux.getComponentCount(); i++) {
+
+			JPanel temp = (JPanel) aux.getComponent(i);
 
 			temp.setBackground(null);
 
