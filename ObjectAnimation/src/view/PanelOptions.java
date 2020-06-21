@@ -354,7 +354,10 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		});
 		spinnerHeight.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
 
-		lblCurrentObject = new JLabel("Current Object: null");
+		Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+		lblCurrentObject = new JLabel("Current Object: Please select or create an Object");
+
 		lblCurrentObject.setBounds(2, 48, 305, 15);
 		panelObject.add(lblCurrentObject);
 		lblCurrentObject.setHorizontalAlignment(SwingConstants.CENTER);
@@ -389,7 +392,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 								// Adding skin
 
 								System.out.println(currentObject.getSkins().size());
-								
+
 								window.getApp().getCurrentProject().getCurrentObject().addSkin(nameSkin, skin,
 										fileSelectedSkin);
 
@@ -592,11 +595,11 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 					}
 
-				}else {
-					
-					JOptionPane.showMessageDialog(window, "First select an object or create one", "No Object Selected", JOptionPane.WARNING_MESSAGE);
-					
-					
+				} else {
+
+					JOptionPane.showMessageDialog(window, "First select an object or create one", "No Object Selected",
+							JOptionPane.WARNING_MESSAGE);
+
 				}
 			}
 		});
@@ -979,20 +982,22 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 		Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
 
-		lblCurrentObject.setText("Current Object: " + currentObject.getNameID());
+		if (currentObject != null) {
+			lblCurrentObject.setText("Current Object: " + currentObject.getNameID());
 
-		spinnerPosX.getModel().setValue(currentObject.getX());
-		spinnerPosY.getModel().setValue(currentObject.getY());
-		spinnerWidth.getModel().setValue(currentObject.getWidth());
-		spinnerHeight.getModel().setValue(currentObject.getHeight());
-		spinnerRefreshMove.getModel().setValue(currentObject.getRefreshMove());
-		spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
-		spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
+			spinnerPosX.getModel().setValue(currentObject.getX());
+			spinnerPosY.getModel().setValue(currentObject.getY());
+			spinnerWidth.getModel().setValue(currentObject.getWidth());
+			spinnerHeight.getModel().setValue(currentObject.getHeight());
+			spinnerRefreshMove.getModel().setValue(currentObject.getRefreshMove());
+			spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
+			spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
 
-		if (currentObject.getAnimation() != null) {
-			spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
-		} else {
-			spinnerTimeRefresh.getModel().setValue(1);
+			if (currentObject.getAnimation() != null) {
+				spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
+			} else {
+				spinnerTimeRefresh.getModel().setValue(1);
+			}
 		}
 	}
 

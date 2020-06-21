@@ -67,18 +67,17 @@ public class Object extends Thread implements Comparable<Object>, Serializable, 
 
 		if (animations.isEmpty()) {
 
-			Animation newAnimation = new Animation(spriteSheet, frames, delay, col, row, timeRefresh, idName);
+			animation = new Animation(spriteSheet, frames, delay, col, row, timeRefresh, idName);
 			animations.add(animation);
 
 			String pathObjectFolder = Application.PATH + "/ObjectAnimationFiles/MyProjects/" + project.getNameID()
 					+ "/MyObjects/" + nameID;
-			newAnimation.createFolder(pathObjectFolder);
+			animation.createFolder(pathObjectFolder);
 
 			// Saving SpriteSheet into folder.
 			Application.saveFile(spriteSelected,
 					pathObjectFolder + "/animations/" + idName + "/SpriteSheet/" + spriteSelected.getName());
 
-			animation = newAnimation;
 			animation.getThread().start();
 
 		} else {
@@ -91,18 +90,17 @@ public class Object extends Thread implements Comparable<Object>, Serializable, 
 
 			} else {
 
-				Animation newAnimation = new Animation(spriteSheet, frames, delay, col, row, timeRefresh, idName);
+				animation = new Animation(spriteSheet, frames, delay, col, row, timeRefresh, idName);
 				animations.add(Math.abs(index) - 1, animation);
 
 				String pathObjectFolder = Application.PATH + "/ObjectAnimationFiles/MyProjects/" + project.getNameID()
 						+ "/MyObjects/" + nameID;
-				newAnimation.createFolder(pathObjectFolder);
+				animation.createFolder(pathObjectFolder);
 
 				// Saving SpriteSheet into folder.
 				Application.saveFile(spriteSelected,
 						pathObjectFolder + "/animations/SpriteSheet/" + spriteSelected.getName());
 
-				animation = newAnimation;
 				animation.getThread().start();
 
 			}
@@ -209,8 +207,8 @@ public class Object extends Thread implements Comparable<Object>, Serializable, 
 
 		if (skin != null)
 			g.drawImage(skin.getImage(), x, y, null);
-		else
-			g.drawRect(x, y, width, height);
+
+		g.drawRect(x, y, width, height);
 
 		if (animation != null)
 			animation.drawAnimation(g, x, y, 0);
@@ -288,6 +286,8 @@ public class Object extends Thread implements Comparable<Object>, Serializable, 
 					File mySprite = spriteFolder.listFiles()[0];
 
 					animations.get(index).setSpriteSheet(ImageIO.read(mySprite));
+					
+					animations.get(index).setImages(new BufferedImage[animations.get(index).getFrames()]);
 
 					animations.get(index).fillSprites();
 
@@ -299,8 +299,6 @@ public class Object extends Thread implements Comparable<Object>, Serializable, 
 				}
 
 			}
-			
-			
 
 		} catch (IOException e) {
 

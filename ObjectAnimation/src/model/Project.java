@@ -12,7 +12,7 @@ public class Project implements Comparable<Project>, Serializable, ISaverReader 
 
 	private String nameID;
 	private ArrayList<Object> myObjects;
-	private transient Object currentObject;
+	private Object currentObject;
 
 	private transient BufferedImage currentSpriteSheet;
 
@@ -102,6 +102,13 @@ public class Project implements Comparable<Project>, Serializable, ISaverReader 
 		for (int i = 0; i < myObjects.size(); i++) {
 
 			myObjects.get(i).start();
+			
+				for(int j = 0 ; j<myObjects.get(i).getAnimations().size();j++) {
+					
+					if(myObjects.get(i).getAnimations().get(j) != null)
+					myObjects.get(i).getAnimations().get(j).getThread().start();
+					
+				}
 
 		}
 
@@ -153,7 +160,7 @@ public class Project implements Comparable<Project>, Serializable, ISaverReader 
 	@Override
 	public String toString() {
 
-		return "Project ID: " + nameID + " SIZE: " + myObjects.size() + "\nObjects:" + myObjects;
+		return "Project ID: " + nameID + "\nObjects:" + myObjects;
 
 	}
 

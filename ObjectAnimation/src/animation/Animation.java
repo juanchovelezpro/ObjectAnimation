@@ -121,11 +121,11 @@ public class Animation implements Comparable<Animation>, Serializable {
 
 		File animFolder = new File(pathObjectFolder + "/animations/" + nameID);
 		animFolder.mkdirs();
-		
-		File spriteFolder = new File(pathObjectFolder+"/animations/"+nameID+"/SpriteSheet");
+
+		File spriteFolder = new File(pathObjectFolder + "/animations/" + nameID + "/SpriteSheet");
 		spriteFolder.mkdirs();
-		
-		File currentImage = new File(pathObjectFolder+"/animations/"+nameID+"/CurrentImage");
+
+		File currentImage = new File(pathObjectFolder + "/animations/" + nameID + "/CurrentImage");
 		currentImage.mkdirs();
 
 	}
@@ -265,9 +265,21 @@ public class Animation implements Comparable<Animation>, Serializable {
 		this.spriteSheet = spriteSheet;
 	}
 
+	public BufferedImage[] getImages() {
+		return images;
+	}
+
+	public void setImages(BufferedImage[] images) {
+		this.images = images;
+	}
+
 	public void setFrames(int frames) {
 
 		this.frames = frames;
+	}
+
+	public int getFrames() {
+		return frames;
 	}
 
 	public void setCol(int col) {
@@ -308,12 +320,12 @@ public class Animation implements Comparable<Animation>, Serializable {
 		}
 
 	}
-	
+
 	@Override
 	public String toString() {
-		
-		return "Animation ID: "+nameID;
-		
+
+		return "Animation ID: " + nameID;
+
 	}
 
 }
