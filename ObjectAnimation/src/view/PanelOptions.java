@@ -35,7 +35,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import animation.Animation;
+import model.Application;
 import model.Object;
+import model.Skin;
 import tools.ImageLoader;
 
 public class PanelOptions extends JPanel implements MouseMotionListener, MouseListener {
@@ -217,7 +219,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 					fileSelectedSprite = chooser.getSelectedFile();
 					pathImage = fileSelectedSprite.getAbsolutePath();
 					sprite = ImageIO.read(new File(pathImage));
-					window.getApp().setCurrentSprite(sprite);
+					window.getApp().getCurrentProject().setCurrentSpriteSheet(sprite);
 					labNoSprites.setText(fileSelectedSprite.getName());
 
 					// Resized image to the Dialog
@@ -301,8 +303,10 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		spinnerRefreshMove.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 
-				window.getApp().getCurrentObject()
-						.setRefreshMove(Integer.parseInt(spinnerRefreshMove.getModel().getValue().toString()));
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setRefreshMove(Integer.parseInt(spinnerRefreshMove.getModel().getValue().toString()));
 
 			}
 		});
@@ -326,9 +330,11 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		spinnerWidth.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 
-				window.getApp().getCurrentObject()
-						.setWidth(Integer.parseInt(spinnerWidth.getModel().getValue().toString()));
-				;
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setWidth(Integer.parseInt(spinnerWidth.getModel().getValue().toString()));
+
 			}
 		});
 		spinnerWidth.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
@@ -339,9 +345,10 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		spinnerHeight.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 
-				window.getApp().getCurrentObject()
-						.setHeight(Integer.parseInt(spinnerHeight.getModel().getValue().toString()));
-				;
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setHeight(Integer.parseInt(spinnerHeight.getModel().getValue().toString()));
 
 			}
 		});
@@ -359,31 +366,54 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 				// Adding a skin to the object
 
-				JFileChooser chooser = new JFileChooser();
-				chooser.showDialog(window, "Add Skin to Object");
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
 
-				String pathImage = "";
-				BufferedImage skin = null;
+				if (currentObject != null) {
+					String nameSkin = JOptionPane.showInputDialog(window, "Put a name to this skin", "Skin name",
+							JOptionPane.QUESTION_MESSAGE);
 
-				try {
+					if (nameSkin != null && !nameSkin.equals("")) {
+						JFileChooser chooser = new JFileChooser();
+						chooser.showDialog(window, "Add Skin to Object");
 
-					if (chooser.getSelectedFile() != null) {
-						fileSelectedSkin = chooser.getSelectedFile();
-						pathImage = fileSelectedSkin.getAbsolutePath();
-						skin = ImageIO.read(new File(pathImage));
+						String pathImage = "";
+						BufferedImage skin = null;
 
-						window.getApp().saveFile(chooser, "skin");
+						try {
 
-						window.getApp().getCurrentObject().setSkin(skin);
+							if (chooser.getSelectedFile() != null) {
+								fileSelectedSkin = chooser.getSelectedFile();
+								pathImage = fileSelectedSkin.getAbsolutePath();
+								skin = ImageIO.read(new File(pathImage));
+
+								// Adding skin
+
+								System.out.println(currentObject.getSkins().size());
+								
+								window.getApp().getCurrentProject().getCurrentObject().addSkin(nameSkin, skin,
+										fileSelectedSkin);
+
+							}
+
+						} catch (Exception ex) {
+
+							JOptionPane.showMessageDialog(window, ex.getMessage(), "Error Adding Skin",
+									JOptionPane.ERROR_MESSAGE);
+
+						}
+
+					} else {
+
+						JOptionPane.showMessageDialog(window, "It can't add a Skin without a name.", "Error skin name",
+								JOptionPane.ERROR_MESSAGE);
 
 					}
+				} else {
 
-				} catch (Exception ex) {
-
-					ex.printStackTrace();
+					JOptionPane.showMessageDialog(window, "First select an object or create one", "No Object Selected",
+							JOptionPane.WARNING_MESSAGE);
 
 				}
-
 			}
 		});
 		btnUploadSkin.setBounds(35, 67, 239, 31);
@@ -395,34 +425,42 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		spinnerSpeedY.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 
-				window.getApp().getCurrentObject()
-						.setSpeedY(Integer.parseInt(spinnerSpeedY.getModel().getValue().toString()));
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setSpeedY(Integer.parseInt(spinnerSpeedY.getModel().getValue().toString()));
 
 			}
 		});
 		spinnerSpeedX.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 
-				window.getApp().getCurrentObject()
-						.setSpeedX(Integer.parseInt(spinnerSpeedX.getModel().getValue().toString()));
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setSpeedX(Integer.parseInt(spinnerSpeedX.getModel().getValue().toString()));
 
 			}
 		});
 		spinnerPosY.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 
-				window.getApp().getCurrentObject().setY(Integer.parseInt(spinnerPosY.getModel().getValue().toString()));
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setY(Integer.parseInt(spinnerPosY.getModel().getValue().toString()));
 			}
 		});
-		spinnerPosY.getModel().setValue(window.getApp().getObject().getY());
 		spinnerPosX.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 
-				window.getApp().getCurrentObject().setX(Integer.parseInt(spinnerPosX.getModel().getValue().toString()));
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setX(Integer.parseInt(spinnerPosX.getModel().getValue().toString()));
 
 			}
 		});
-		spinnerPosX.getModel().setValue(window.getApp().getObject().getX());
 
 		panelAnimation = new JPanel();
 		sl_aux.putConstraint(SpringLayout.NORTH, panelAnimation, 587, SpringLayout.NORTH, this);
@@ -466,16 +504,21 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 			public void mousePressed(MouseEvent e) {
 
 				// Resume and pause current object's animation
-				Animation currentAnimation = window.getApp().getCurrentObject().getAnimation();
 
-				if (currentAnimation != null) {
-					if (!currentAnimation.isPause()) {
-						currentAnimation.setPause(true);
-					} else {
-						currentAnimation.setPause(false);
-						currentAnimation.getThread().resumeAnimation();
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null) {
+					Animation currentAnimation = window.getApp().getCurrentProject().getCurrentObject().getAnimation();
+
+					if (currentAnimation != null) {
+						if (!currentAnimation.isPause()) {
+							currentAnimation.setPause(true);
+						} else {
+							currentAnimation.setPause(false);
+							currentAnimation.getThread().resumeAnimation();
+						}
+
 					}
-
 				}
 			}
 		});
@@ -503,49 +546,58 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 				// Adding animation to current object
 
-				BufferedImage currentSprite = window.getApp().getCurrentSprite();
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
 
-				if (currentSprite != null) {
-					int sprites = Integer.parseInt(spinnerNumSprites.getModel().getValue().toString());
-					int rows = Integer.parseInt(spinnerRows.getModel().getValue().toString());
-					int cols = Integer.parseInt(spinnerCols.getModel().getValue().toString());
-					int delay = Integer.parseInt(spinnerDelay.getModel().getValue().toString());
-					int refresh = Integer.parseInt(spinnerTimeRefresh.getModel().getValue().toString());
+				if (currentObject != null) {
+					BufferedImage currentSprite = window.getApp().getCurrentProject().getCurrentSpriteSheet();
 
-					try {
+					if (currentSprite != null) {
+						int sprites = Integer.parseInt(spinnerNumSprites.getModel().getValue().toString());
+						int rows = Integer.parseInt(spinnerRows.getModel().getValue().toString());
+						int cols = Integer.parseInt(spinnerCols.getModel().getValue().toString());
+						int delay = Integer.parseInt(spinnerDelay.getModel().getValue().toString());
+						int refresh = Integer.parseInt(spinnerTimeRefresh.getModel().getValue().toString());
 
-						String id = JOptionPane.showInputDialog(window, "Put a name ID to this Animation",
-								"Animation ID", JOptionPane.QUESTION_MESSAGE);
+						try {
 
-						if (id != null && !id.equals("")) {
-							Animation animation = new Animation(currentSprite, sprites, delay, cols, rows,
-									window.getApp().getCurrentObject(), refresh, id);
+							String id = JOptionPane.showInputDialog(window, "Put a name ID to this Animation",
+									"Animation ID", JOptionPane.QUESTION_MESSAGE);
 
-							window.getApp().getCurrentObject().setAnimation(animation);
+							if (id != null && !id.equals("")) {
 
-							window.getApp().getCurrentObject().getAnimation().getThread().start();
-						} else {
+								// Add Animation
 
-							JOptionPane.showMessageDialog(window,
-									"It can't add an Animation without an ID. \n Try again please.",
-									"Error No Animation ID", JOptionPane.ERROR_MESSAGE);
+								window.getApp().getCurrentProject().getCurrentObject().addAnimation(id, currentSprite,
+										sprites, delay, cols, rows, refresh, fileSelectedSprite);
+
+							} else {
+
+								JOptionPane.showMessageDialog(window,
+										"It can't add an Animation without an ID. \n Try again please.",
+										"Error No Animation ID", JOptionPane.ERROR_MESSAGE);
+
+							}
+						} catch (Exception ex) {
+
+							JOptionPane.showMessageDialog(null, ex.getCause() + "\n" + ex.getLocalizedMessage()
+									+ "\n There is a problem with the sprite sheet. Please check columns and rows and the quantity of sprites.",
+									"FATAL ERROR", JOptionPane.ERROR_MESSAGE);
 
 						}
-					} catch (Exception ex) {
 
-						JOptionPane.showMessageDialog(null, ex.getCause() + "\n" + ex.getLocalizedMessage()
-								+ "\n There is a problem with the sprite sheet. Please check columns and rows and the quantity of sprites.",
-								"FATAL ERROR", JOptionPane.ERROR_MESSAGE);
+					} else {
+
+						JOptionPane.showMessageDialog(null, "First add a Sprite Sheet", "Error - No Sprite sheet found",
+								JOptionPane.ERROR_MESSAGE);
 
 					}
 
-				} else {
-
-					JOptionPane.showMessageDialog(null, "First add a Sprite Sheet", "Error - No Sprite sheet found",
-							JOptionPane.ERROR_MESSAGE);
-
+				}else {
+					
+					JOptionPane.showMessageDialog(window, "First select an object or create one", "No Object Selected", JOptionPane.WARNING_MESSAGE);
+					
+					
 				}
-
 			}
 		});
 
@@ -658,7 +710,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 				try {
 					if (name != null && !name.equalsIgnoreCase("")) {
-						window.getApp().addObject(name);
+						window.getApp().getCurrentProject().addObject(name);
 						updateValues();
 					} else {
 						JOptionPane.showMessageDialog(null, "Please enter a name or the object it won't be added",
@@ -925,7 +977,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 	public void updateValues() {
 
-		Object currentObject = window.getApp().getCurrentObject();
+		Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
 
 		lblCurrentObject.setText("Current Object: " + currentObject.getNameID());
 

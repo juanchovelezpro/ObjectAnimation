@@ -4,11 +4,13 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.Collections;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import model.Application;
 import model.Project;
 import threads.ThreadUpdater;
 import tools.ImageLoader;
@@ -21,7 +23,8 @@ public class MainWindow extends JFrame {
 			.getDisplayMode().getHeight();
 
 	private boolean isFullScreen = true;
-	private Project app;
+
+	private Application app;
 	private PanelOptions options;
 	private Canvas canvas;
 	private ThreadUpdater updater;
@@ -31,12 +34,11 @@ public class MainWindow extends JFrame {
 		setTitle("Object Animation");
 		setLayout(null);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		createSourceFolders();
-		onClose();
 		setSize(WIDTH, HEIGHT);
 		setUndecorated(true);
 		setExtendedState(MAXIMIZED_BOTH);
 		setLocationRelativeTo(null);
+		onClose();
 
 		setIconImage(ImageLoader.cargarImagen("images/icon.jpg"));
 
@@ -47,11 +49,13 @@ public class MainWindow extends JFrame {
 		} catch (Exception ex) {
 
 			ex.printStackTrace();
-			
+
 		}
 
-		app = new Project();
-		app.read();
+		app = new Application();
+
+		createOrChooseProject();
+
 		options = new PanelOptions(this);
 		canvas = new Canvas(this);
 
@@ -60,20 +64,107 @@ public class MainWindow extends JFrame {
 
 		updater = new ThreadUpdater(this);
 		updater.start();
+		
+		app.getCurrentProject().initAllThreads();
 
 	}
 
-	public void createSourceFolders() {
+	public void createOrChooseProject() {
 
-		String dir = System.getProperty("user.dir");
-		File folder = new File(dir + "/ObjectAnimationFiles");
-		folder.mkdirs();
+		String[] options = { "Create a project", "Choose a project" };
 
-		File objects = new File(folder.getPath() + "/MyObjects");
-		objects.mkdirs();
+		int option = JOptionPane.showOptionDialog(this, "Select an option", "What you want to do?",
+				JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-		File dataFolder = new File(folder.getPath() + "/data");
-		dataFolder.mkdirs();
+		if (option != -1) {
+
+			switch (option) {
+
+			case 0:
+
+				createProject();
+
+				break;
+
+			case 1:
+
+				chooseProject();
+
+				break;
+
+			}
+		} else {
+
+			System.exit(0);
+
+		}
+
+	}
+
+	public void createProject() {
+
+		String nameProject = JOptionPane.showInputDialog(this, "Enter a name to your project", "Project Name",
+				JOptionPane.QUESTION_MESSAGE);
+
+		if (nameProject != null && !nameProject.equals("")) {
+			try {
+				app.addProject(nameProject);
+			} catch (Exception e) {
+
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Error creating Project",
+						JOptionPane.ERROR_MESSAGE);
+
+				createOrChooseProject();
+
+			}
+
+		} else {
+			JOptionPane.showMessageDialog(this, "It can't create a project with an empty name.\nTry again",
+					"Error Creating Project", JOptionPane.ERROR_MESSAGE);
+
+			createOrChooseProject();
+
+		}
+
+	}
+
+	public void chooseProject() {
+
+		int size = app.getProjects().size();
+
+		if (size > 0) {
+
+			String[] listProjects = new String[size];
+
+			for (int i = 0; i < size; i++) {
+
+				listProjects[i] = app.getProjects().get(i).getNameID();
+
+			}
+
+			String project = (String) JOptionPane.showInputDialog(this, "Select a project", "Projects",
+					JOptionPane.DEFAULT_OPTION, null, listProjects, listProjects[0]);
+
+			if (project != null) {
+
+				int index = Collections.binarySearch(app.getProjects(), new Project(project));
+
+				app.setCurrentProject(app.getProjects().get(index));
+
+			} else {
+
+				createOrChooseProject();
+
+			}
+
+		} else {
+
+			JOptionPane.showMessageDialog(this, "There are no projects. Try to create a new project",
+					"No Projects Found", JOptionPane.ERROR_MESSAGE);
+
+			createOrChooseProject();
+
+		}
 
 	}
 
@@ -93,7 +184,11 @@ public class MainWindow extends JFrame {
 
 				case 1:
 					app.save();
+
 					System.out.println("Saved.");
+
+					System.out.println("Log: " + app.getProjects());
+
 					dispose();
 					setVisible(false);
 					System.exit(0);
@@ -130,11 +225,11 @@ public class MainWindow extends JFrame {
 		this.isFullScreen = isFullScreen;
 	}
 
-	public Project getApp() {
+	public Application getApp() {
 		return app;
 	}
 
-	public void setApp(Project app) {
+	public void setApp(Application app) {
 		this.app = app;
 	}
 

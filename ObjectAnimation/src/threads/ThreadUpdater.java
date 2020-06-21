@@ -2,8 +2,9 @@ package threads;
 
 import view.MainWindow;
 import view.PanelOptions;
+import model.Object;
 
-public class ThreadUpdater extends Thread{
+public class ThreadUpdater extends Thread {
 
 	private MainWindow window;
 
@@ -16,11 +17,23 @@ public class ThreadUpdater extends Thread{
 
 		PanelOptions options = window.getOptions();
 
-		if (window.getApp().getCurrentObject().getSpeedX() != 0)
-			options.getSpinnerPosX().setValue(window.getApp().getCurrentObject().getX());
+		Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
 
-		if (window.getApp().getCurrentObject().getSpeedY() != 0)
-			options.getSpinnerPosY().setValue(window.getApp().getCurrentObject().getY());
+		if (currentObject != null) {
+			if (currentObject.getSpeedX() != 0)
+				options.getSpinnerPosX().setValue(currentObject.getX());
+
+			if (currentObject.getSpeedY() != 0)
+				options.getSpinnerPosY().setValue(currentObject.getY());
+
+			int refresh = Integer
+					.parseInt(window.getOptions().getSpinnerTimeRefresh().getModel().getValue().toString());
+
+			if (refresh != 1) {
+				if (currentObject.getAnimation() != null)
+					currentObject.getAnimation().setTimeRefresh(refresh);
+			}
+		}
 
 	}
 
@@ -30,14 +43,6 @@ public class ThreadUpdater extends Thread{
 		while (true) {
 
 			updateObjectParameters();
-
-			int refresh = Integer
-					.parseInt(window.getOptions().getSpinnerTimeRefresh().getModel().getValue().toString());
-
-			if (refresh != 1) {
-				if (window.getApp().getCurrentObject().getAnimation() != null)
-					window.getApp().getCurrentObject().getAnimation().setTimeRefresh(refresh);
-			}
 
 		}
 

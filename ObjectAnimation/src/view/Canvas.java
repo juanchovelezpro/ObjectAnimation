@@ -61,7 +61,7 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 
 	public void renderObjects(Graphics g) {
 
-		ArrayList<Object> objects = window.getApp().getMyObjects();
+		ArrayList<Object> objects = window.getApp().getCurrentProject().getMyObjects();
 
 		for (int i = 0; i < objects.size(); i++) {
 
@@ -91,7 +91,7 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 	@Override
 	public void mousePressed(MouseEvent e) {
 
-		ArrayList<Object> objects = window.getApp().getMyObjects();
+		ArrayList<Object> objects = window.getApp().getCurrentProject().getMyObjects();
 
 		for (int i = 0; i < objects.size(); i++) {
 
@@ -100,7 +100,7 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 			if (e.getX() >= temp.getX() && e.getX() <= temp.getX() + temp.getWidth() && e.getY() >= temp.getY()
 					&& e.getY() <= temp.getY() + temp.getHeight()) {
 
-				window.getApp().setCurrentObject(temp);
+				window.getApp().getCurrentProject().setCurrentObject(temp);
 				window.getOptions().updateValues();
 				temp.setX(e.getX() - temp.getWidth() / 2);
 				temp.setY(e.getY() - temp.getHeight() / 2);
@@ -121,22 +121,25 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 	@Override
 	public void mouseDragged(MouseEvent e) {
 
-		Object current = window.getApp().getCurrentObject();
+		Object current = window.getApp().getCurrentProject().getCurrentObject();
 
-		if (e.getX() >= current.getX() && e.getX() <= current.getX() + current.getWidth() && e.getY() >= current.getY()
-				&& e.getY() <= current.getY() + current.getHeight()) {
+		if (current != null) {
 
-			window.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+			if (e.getX() >= current.getX() && e.getX() <= current.getX() + current.getWidth()
+					&& e.getY() >= current.getY() && e.getY() <= current.getY() + current.getHeight()) {
 
-			current.setX(e.getX() - current.getWidth() / 2);
-			current.setY(e.getY() - current.getHeight() / 2);
+				window.setCursor(new Cursor(Cursor.MOVE_CURSOR));
 
-			window.getOptions().updateValues();
+				current.setX(e.getX() - current.getWidth() / 2);
+				current.setY(e.getY() - current.getHeight() / 2);
 
-		} else {
+				window.getOptions().updateValues();
 
-			window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			} else {
 
+				window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+			}
 		}
 
 	}
