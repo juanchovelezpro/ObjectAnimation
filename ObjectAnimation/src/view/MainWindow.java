@@ -1,23 +1,15 @@
 package view;
 
-import java.awt.BorderLayout;
-import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 
-import model.Application;
+import model.Project;
 import threads.ThreadUpdater;
 import tools.ImageLoader;
 
@@ -29,7 +21,7 @@ public class MainWindow extends JFrame {
 			.getDisplayMode().getHeight();
 
 	private boolean isFullScreen = true;
-	private Application app;
+	private Project app;
 	private PanelOptions options;
 	private Canvas canvas;
 	private ThreadUpdater updater;
@@ -54,9 +46,11 @@ public class MainWindow extends JFrame {
 
 		} catch (Exception ex) {
 
+			ex.printStackTrace();
+			
 		}
 
-		app = new Application();
+		app = new Project();
 		app.read();
 		options = new PanelOptions(this);
 		canvas = new Canvas(this);
@@ -68,8 +62,6 @@ public class MainWindow extends JFrame {
 		updater.start();
 
 	}
-
-
 
 	public void createSourceFolders() {
 
@@ -138,11 +130,11 @@ public class MainWindow extends JFrame {
 		this.isFullScreen = isFullScreen;
 	}
 
-	public Application getApp() {
+	public Project getApp() {
 		return app;
 	}
 
-	public void setApp(Application app) {
+	public void setApp(Project app) {
 		this.app = app;
 	}
 

@@ -3,17 +3,18 @@ package model;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 
 import animation.Animation;
 import view.Canvas;
 
 public class Object extends Thread implements Comparable<Object>, Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private ArrayList<Animation> animations;
@@ -26,14 +27,13 @@ public class Object extends Thread implements Comparable<Object>, Serializable {
 	private int width;
 	private int height;
 	private transient Image skin;
-	private String skinPath;
 	private int refreshMove;
 	private Animation animation;
-	private transient Application app;
+	private Project project;
 
-	public Object(Application app) {
+	public Object(Project project) {
 
-		this.app = app;
+		this.project = project;
 		nameID = "";
 		speedX = 0;
 		speedY = 0;
@@ -42,7 +42,6 @@ public class Object extends Thread implements Comparable<Object>, Serializable {
 		x = Canvas.WIDTH / 2 - width / 2;
 		y = Canvas.HEIGHT / 2 - height / 2;
 		skin = null;
-		skinPath = "";
 		refreshMove = 10;
 		animation = null;
 
@@ -97,20 +96,12 @@ public class Object extends Thread implements Comparable<Object>, Serializable {
 		this.animation = animation;
 	}
 
-	public Application getApp() {
-		return app;
+	public Project getProject() {
+		return project;
 	}
 
-	public void setApp(Application app) {
-		this.app = app;
-	}
-
-	public String getSkinPath() {
-		return skinPath;
-	}
-
-	public void setSkinPath(String skinPath) {
-		this.skinPath = skinPath;
+	public void setProject(Project project) {
+		this.project = project;
 	}
 
 	public int getWidth() {
@@ -224,6 +215,25 @@ public class Object extends Thread implements Comparable<Object>, Serializable {
 				e.printStackTrace();
 			}
 
+		}
+
+	}
+
+	// To recover all images (transient to serialize) saved into this object.
+	public void read() {
+
+		String myFolder = System.getProperty("user.dir") + "/ObjectAnimationFiles/MyObjects/" + nameID + "/skins";
+
+		File file = new File(myFolder);
+		File[] skins = file.listFiles();
+
+		try {
+
+			if (skins.length > 0)
+				skin = ImageIO.read(skins[0]);
+		} catch (IOException e) {
+
+			e.printStackTrace();
 		}
 
 	}

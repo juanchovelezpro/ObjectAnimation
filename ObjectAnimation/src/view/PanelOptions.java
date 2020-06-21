@@ -17,6 +17,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -225,10 +229,10 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 
 					// Resized image to the Dialog
 
-					Image resized = ImageLoader.resizeToFit(sprite, new Dimension(250,250));
-					
-					JOptionPane.showMessageDialog(window, "The Sprite has been uploaded successfully", "Sprite Uploaded",
-							JOptionPane.INFORMATION_MESSAGE, new ImageIcon(resized));
+					Image resized = ImageLoader.resizeToFit(sprite, new Dimension(250, 250));
+
+					JOptionPane.showMessageDialog(window, "The Sprite has been uploaded successfully",
+							"Sprite Uploaded", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(resized));
 
 				}
 
@@ -359,9 +363,9 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		btnUploadSkin = new JButton("Add Skin");
 		btnUploadSkin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				// Adding a skin to the object
-				
+
 				JFileChooser chooser = new JFileChooser();
 				chooser.showDialog(window, "Add Skin to Object");
 
@@ -374,10 +378,10 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 						fileSelectedSkin = chooser.getSelectedFile();
 						pathImage = fileSelectedSkin.getAbsolutePath();
 						skin = ImageIO.read(new File(pathImage));
-						
-						
+
+						window.getApp().saveFile(chooser, "skin");
+
 						window.getApp().getCurrentObject().setSkin(skin);
-						
 
 					}
 
@@ -386,7 +390,7 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 					ex.printStackTrace();
 
 				}
-				
+
 			}
 		});
 		btnUploadSkin.setBounds(35, 67, 239, 31);
@@ -516,13 +520,24 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 					int refresh = Integer.parseInt(spinnerTimeRefresh.getModel().getValue().toString());
 
 					try {
-						Animation animation = new Animation(currentSprite, sprites, delay, cols, rows,
-								window.getApp().getCurrentObject(), refresh);
 
-						window.getApp().getCurrentObject().setAnimation(animation);
+						String id = JOptionPane.showInputDialog(window, "Put a name ID to this Animation",
+								"Animation ID", JOptionPane.QUESTION_MESSAGE);
 
-						window.getApp().getCurrentObject().getAnimation().getThread().start();
+						if (id != null && !id.equals("")) {
+							Animation animation = new Animation(currentSprite, sprites, delay, cols, rows,
+									window.getApp().getCurrentObject(), refresh, id);
 
+							window.getApp().getCurrentObject().setAnimation(animation);
+
+							window.getApp().getCurrentObject().getAnimation().getThread().start();
+						} else {
+
+							JOptionPane.showMessageDialog(window,
+									"It can't add an Animation without an ID. \n Try again please.",
+									"Error No Animation ID", JOptionPane.ERROR_MESSAGE);
+
+						}
 					} catch (Exception ex) {
 
 						JOptionPane.showMessageDialog(null, ex.getCause() + "\n" + ex.getLocalizedMessage()

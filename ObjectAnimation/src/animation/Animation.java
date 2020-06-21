@@ -77,6 +77,8 @@ public class Animation implements Serializable {
 
 	private Object object;
 
+	private String nameID;
+
 	private AnimationThread thread;
 
 	private int timeRefresh;
@@ -90,7 +92,8 @@ public class Animation implements Serializable {
 	 * @param col    The number of columns that the image has of sprites.
 	 * @param row    The number of rows that the image has of sprites.
 	 */
-	public Animation(BufferedImage image, int frames, int speed, int col, int row, Object object, int timeRefresh) {
+	public Animation(BufferedImage image, int frames, int speed, int col, int row, Object object, int timeRefresh,
+			String nameID) {
 
 		this.image = image;
 		this.frames = frames;
@@ -99,6 +102,7 @@ public class Animation implements Serializable {
 		this.row = row;
 		this.timeRefresh = timeRefresh;
 		this.object = object;
+		this.nameID = nameID;
 		thread = new AnimationThread(this);
 		images = new BufferedImage[frames];
 		alive = true;
@@ -189,6 +193,14 @@ public class Animation implements Serializable {
 		this.timeRefresh = timeRefresh;
 	}
 
+	public String getNameID() {
+		return nameID;
+	}
+
+	public void setNameID(String nameID) {
+		this.nameID = nameID;
+	}
+
 	/**
 	 * Uses the method next frames to simulate an animation changing frames in an
 	 * execution
@@ -239,6 +251,10 @@ public class Animation implements Serializable {
 	public void setRow(int row) {
 
 		this.row = row;
+
+	}
+
+	public void read() {
 
 	}
 
