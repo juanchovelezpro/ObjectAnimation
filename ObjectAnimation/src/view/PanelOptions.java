@@ -1006,9 +1006,11 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 			spinnerRefreshMove.getModel().setValue(currentObject.getRefreshMove());
 			spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
 			spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
+			
 
 			if (currentObject.getAnimation() != null) {
 				spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
+				spinnerDelay.getModel().setValue(currentObject.getAnimation().getDelay());
 			} else {
 				spinnerTimeRefresh.getModel().setValue(1);
 			}
