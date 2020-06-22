@@ -2,6 +2,10 @@ package animation;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.Serializable;
+
+import model.ISaverReader;
 import model.Object;
 import threads.AnimationThread;
 
@@ -11,12 +15,17 @@ import threads.AnimationThread;
  * @author Juan Camilo Vélez Olaya
  *
  */
-public class Animation {
+public class Animation implements Comparable<Animation>, Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4L;
 
 	/**
 	 * The speed of the animation
 	 */
-	private int speed;
+	private int delay;
 
 	/**
 	 * The quantity of frames (Sprite Sheets)
@@ -46,17 +55,17 @@ public class Animation {
 	/**
 	 * It is the image to get the sprite sheets.
 	 */
-	private BufferedImage image;
+	private transient BufferedImage spriteSheet;
 
 	/**
 	 * It is an array of the sub images (sprites)
 	 */
-	private BufferedImage[] images;
+	private transient BufferedImage[] images;
 
 	/**
 	 * It is the current sprite for the animation.
 	 */
-	private BufferedImage currentImage;
+	private transient BufferedImage currentImage;
 
 	/**
 	 * Variable to know if the animation has finished.
@@ -68,11 +77,17 @@ public class Animation {
 	 */
 	private boolean pause;
 
-	private Object object;
+	private String nameID;
 
 	private AnimationThread thread;
 
 	private int timeRefresh;
+
+	public Animation(String nameID) {
+
+		this.nameID = nameID;
+
+	}
 
 	/**
 	 * Constructor to create an animation
@@ -83,15 +98,16 @@ public class Animation {
 	 * @param col    The number of columns that the image has of sprites.
 	 * @param row    The number of rows that the image has of sprites.
 	 */
-	public Animation(BufferedImage image, int frames, int speed, int col, int row, Object object, int timeRefresh) {
+	public Animation(BufferedImage spriteSheet, int frames, int delay, int col, int row, int timeRefresh,
+			String nameID) {
 
-		this.image = image;
+		this.spriteSheet = spriteSheet;
 		this.frames = frames;
-		this.speed = speed;
+		this.delay = delay;
 		this.col = col;
 		this.row = row;
 		this.timeRefresh = timeRefresh;
-		this.object = object;
+		this.nameID = nameID;
 		thread = new AnimationThread(this);
 		images = new BufferedImage[frames];
 		alive = true;
@@ -101,13 +117,26 @@ public class Animation {
 
 	}
 
+	public void createFolder(String pathObjectFolder) {
+
+		File animFolder = new File(pathObjectFolder + "/animations/" + nameID);
+		animFolder.mkdirs();
+
+		File spriteFolder = new File(pathObjectFolder + "/animations/" + nameID + "/SpriteSheet");
+		spriteFolder.mkdirs();
+
+		File currentImage = new File(pathObjectFolder + "/animations/" + nameID + "/CurrentImage");
+		currentImage.mkdirs();
+
+	}
+
 	/**
 	 * Puts all the sprites sheets in an array.
 	 * 
 	 */
 	public void fillSprites() {
 
-		SpriteSheet ss = new SpriteSheet(image);
+		SpriteSheet ss = new SpriteSheet(spriteSheet);
 
 		int k = 0;
 
@@ -115,7 +144,8 @@ public class Animation {
 
 			for (int j = 1; j <= col; j++, k++) {
 
-				images[k] = ss.grabImage(i, j, (int) image.getWidth() / col, (int) image.getHeight() / row);
+				if(k<frames)
+				images[k] = ss.grabImage(i, j, (int) spriteSheet.getWidth() / col, (int) spriteSheet.getHeight() / row);
 
 			}
 
@@ -158,14 +188,6 @@ public class Animation {
 		this.pause = pause;
 	}
 
-	public Object getObject() {
-		return object;
-	}
-
-	public void setObject(Object object) {
-		this.object = object;
-	}
-
 	public AnimationThread getThread() {
 		return thread;
 	}
@@ -182,6 +204,14 @@ public class Animation {
 		this.timeRefresh = timeRefresh;
 	}
 
+	public String getNameID() {
+		return nameID;
+	}
+
+	public void setNameID(String nameID) {
+		this.nameID = nameID;
+	}
+
 	/**
 	 * Uses the method next frames to simulate an animation changing frames in an
 	 * execution
@@ -189,7 +219,7 @@ public class Animation {
 	public void runAnimation() {
 
 		index++;
-		if (index > speed) {
+		if (index > delay) {
 
 			index = 0;
 			nextFrame();
@@ -212,15 +242,45 @@ public class Animation {
 
 	}
 
-	public void setImage(BufferedImage image) {
+	public BufferedImage getCurrentImage() {
+		return currentImage;
+	}
 
-		this.image = image;
+	public void setCurrentImage(BufferedImage currentImage) {
+		this.currentImage = currentImage;
+	}
 
+	public int getCol() {
+		return col;
+	}
+
+	public int getRow() {
+		return row;
+	}
+
+	public BufferedImage getSpriteSheet() {
+		return spriteSheet;
+	}
+
+	public void setSpriteSheet(BufferedImage spriteSheet) {
+		this.spriteSheet = spriteSheet;
+	}
+
+	public BufferedImage[] getImages() {
+		return images;
+	}
+
+	public void setImages(BufferedImage[] images) {
+		this.images = images;
 	}
 
 	public void setFrames(int frames) {
 
 		this.frames = frames;
+	}
+
+	public int getFrames() {
+		return frames;
 	}
 
 	public void setCol(int col) {
@@ -232,6 +292,40 @@ public class Animation {
 	public void setRow(int row) {
 
 		this.row = row;
+
+	}
+
+	public int getDelay() {
+		return delay;
+	}
+
+	public void setDelay(int delay) {
+		this.delay = delay;
+	}
+
+	@Override
+	public int compareTo(Animation o) {
+
+		if (nameID.compareTo(o.getNameID()) > 0) {
+
+			return 1;
+
+		} else if (nameID.compareTo(o.getNameID()) < 0) {
+
+			return -1;
+
+		} else {
+
+			return 0;
+
+		}
+
+	}
+
+	@Override
+	public String toString() {
+
+		return "Animation ID: " + nameID;
 
 	}
 

@@ -1,137 +1,236 @@
 package model;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import view.MainWindow;
+import javax.swing.JFileChooser;
 
-public class Application {
+public class Application implements ISaverReader, Serializable {
 
-	private ArrayList<Object> myObjects;
+	private static final long serialVersionUID = 1L;
 
-	private Object object;
-	private Object currentObject;
+	public static final String PATH = System.getProperty("user.home");
 
-	private int speedAnimation;
-	private BufferedImage currentSprite;
-	private MainWindow window;
+	private ArrayList<Project> projects;
+	private Project currentProject;
 
-	public Application(MainWindow window) {
+	public Application() {
 
-		this.window = window;
-		object = new Object(this);
-		currentObject = object;
-		speedAnimation = 0;
-		currentSprite = null;
-
-		myObjects = new ArrayList<>();
+		createSourceFolder();
+		projects = new ArrayList<>();
+		currentProject = null;
+		read();
 
 	}
 
-	public void addObject(String idName) throws Exception {
+	public void addProject(String nameID) throws Exception {
 
-		object.setNameID(idName);
+		if (projects.isEmpty()) {
 
-		if (myObjects.isEmpty()) {
-			
-			currentObject = object;			
-			
-			myObjects.add(object);
-
-			String dir = System.getProperty("user.dir");
-
-			File objectFolder = new File(dir + "/ObjectAnimationFiles/MyObjects/" + idName);
-			objectFolder.mkdirs();
-		
-			object = new Object(this);
-			
+			currentProject = new Project(nameID);
+			currentProject.createFolder();
+			projects.add(currentProject);
 
 		} else {
 
-			int index = exists(idName);
-			System.out.println("index " + index);
+			int index = exists(nameID);
 
 			if (index >= 0) {
 
-				throw new Exception("There is an object with this name already");
+				throw new Exception("There is another project with the name ->" + nameID);
 
 			} else {
 
-				currentObject = object;
-				
-				myObjects.add(Math.abs(index) - 1, object);
-
-				String dir = System.getProperty("user.dir");
-
-				File objectFolder = new File(dir + "/ObjectAnimationFiles/MyObjects/" + idName);
-				objectFolder.mkdirs();
-				
-				object = new Object(this);
-				
+				currentProject = new Project(nameID);
+				currentProject.createFolder();
+				projects.add(Math.abs(index) - 1, currentProject);
 
 			}
 
 		}
 
-		System.out.println("List Objects Size: " + myObjects.size());
-		System.out.println(myObjects.toString());
+	}
+
+	public void removeProject(String nameID) throws Exception {
+
+		int index = exists(nameID);
+
+		if (index >= 0) {
+
+			projects.remove(Math.abs(index) - 1);
+
+		} else {
+
+			throw new Exception("There is no a project with the name ->" + nameID);
+
+		}
 
 	}
 
-	public int exists(String idName) {
+	public int exists(String nameID) {
 
-		int index = Collections.binarySearch(myObjects, new Object(idName), new ComparatorObjectName());
+		int index = Collections.binarySearch(projects, new Project(nameID));
 
 		return index;
 	}
 
-	public ArrayList<Object> getMyObjects() {
-		return myObjects;
+	private void createSourceFolder() {
+
+		File folder = new File(PATH + "/ObjectAnimationFiles");
+		folder.mkdirs();
+
+		File objects = new File(folder.getPath() + "/MyProjects");
+		objects.mkdirs();
+
+		File dataFolder = new File(folder.getPath() + "/data");
+		dataFolder.mkdirs();
+
 	}
 
-	public void setMyObjects(ArrayList<Object> myObjects) {
-		this.myObjects = myObjects;
+	public static void saveFile(File selectedFile, String target) {
+
+		Path from = Paths.get(selectedFile.toURI());
+
+		Path to = Paths.get(target);
+
+		try {
+			Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+			System.out.println("Data saved.");
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+
 	}
 
-	public BufferedImage getCurrentSprite() {
-		return currentSprite;
+	@Override
+	public void save() {
+
+		FileOutputStream fS = null;
+		ObjectOutputStream oS = null;
+
+
+		try {
+
+			currentProject.save();
+			
+			File folderData = new File(PATH + "/ObjectAnimationFiles/data");
+			folderData.mkdirs();
+
+			fS = new FileOutputStream(folderData.getAbsolutePath() + "/app.dat", false);
+			oS = new ObjectOutputStream(fS);
+
+			oS.writeObject(projects);
+
+			System.out.println("Log: Saving Projects -> Projects ID: " + projects);
+			
+
+		} catch (FileNotFoundException ex) {
+
+			System.out.println(ex.getMessage());
+
+		} catch (IOException ex) {
+
+			System.out.println(ex.getMessage());
+
+		} finally {
+
+			try {
+
+				if (projects != null) {
+
+					fS.close();
+
+				}
+				if (oS != null) {
+
+					oS.close();
+
+				}
+
+			} catch (IOException ex) {
+
+				System.out.println("An error ocurred saving... "+ ex.getMessage());
+
+			}
+		}
+
 	}
 
-	public void setCurrentSprite(BufferedImage currentSprite) {
-		this.currentSprite = currentSprite;
+	@Override
+	public void read() {
+
+		FileInputStream fS = null;
+		ObjectInputStream oS = null;
+
+		String fullPath = PATH + "/ObjectAnimationFiles/data/app.dat";
+		File verify = new File(fullPath);
+		if (verify.exists()) {
+
+			try {
+
+				fS = new FileInputStream(fullPath);
+				oS = new ObjectInputStream(fS);
+				projects = (ArrayList<Project>) oS.readObject();
+
+			} catch (Exception ex) {
+
+				ex.printStackTrace();
+
+			} finally {
+
+				try {
+					if (fS != null) {
+						fS.close();
+					}
+					if (oS != null) {
+						oS.close();
+					}
+				} catch (IOException e) {
+
+					e.printStackTrace();
+
+				}
+
+			}
+
+			System.out.println("Log:  Reading Projects... \n" + projects);
+			for (int i = 0; i < projects.size(); i++) {
+
+				projects.get(i).read();
+
+			}
+
+		}
+
 	}
 
-	public int getSpeedAnimation() {
-		return speedAnimation;
+	public Project getCurrentProject() {
+		return currentProject;
 	}
 
-	public void setSpeedAnimation(int speedAnimation) {
-		this.speedAnimation = speedAnimation;
+	public void setCurrentProject(Project currentProject) {
+		this.currentProject = currentProject;
 	}
 
-	public Object getObject() {
-		return object;
+	public ArrayList<Project> getProjects() {
+		return projects;
 	}
 
-	public void setObject(Object object) {
-		this.object = object;
+	public void setProjects(ArrayList<Project> projects) {
+		this.projects = projects;
 	}
 
-	public MainWindow getWindow() {
-		return window;
-	}
-
-	public void setWindow(MainWindow window) {
-		this.window = window;
-	}
-
-	public Object getCurrentObject() {
-		return currentObject;
-	}
-
-	public void setCurrentObject(Object currentObject) {
-		this.currentObject = currentObject;
-	}
 }

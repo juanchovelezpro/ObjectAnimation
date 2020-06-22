@@ -1,18 +1,26 @@
 package view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,23 +28,28 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import animation.Animation;
+import model.Application;
 import model.Object;
+import model.Skin;
 import tools.ImageLoader;
-import javax.swing.JScrollPane;
 
-public class PanelOptions extends JPanel {
+public class PanelOptions extends JPanel implements MouseMotionListener, MouseListener {
 
 	public static final int WIDTH = 310;
-	public static final int HEIGHT = MainWindow.HEIGHT;
+	public static final int HEIGHT = MainWindow.HEIGHT * 4;
 
 	private MainWindow window;
-	private File fileSelected;
+
+	private File fileSelectedSprite;
+	private File fileSelectedSkin;
+	private File backgroundImageCanvas;
 	private JLabel labNoSprites;
 	private JSpinner spinnerRows;
 	private JSpinner spinnerCols;
@@ -51,92 +64,128 @@ public class PanelOptions extends JPanel {
 	private JSpinner spinnerHeight;
 	private JSpinner spinnerRefreshMove;
 
+	// Point to get the origin position when the panel gonna be dragged up or down.
+	private Point origin;
+	private JButton btnCreateObject;
+	private JLabel lblOptions;
+	private JButton btnAddAnimation;
+	private JButton btnFullScreen;
+	private JButton btnAddSprite;
+	private JButton btnMyObjects;
+	private JButton btnBackgroundImage;
+	private JButton btnUploadSkin;
+	private JButton btnSettings;
+	private JButton btnCanvasColor;
+	private JLabel lblPosX;
+	private JLabel lblDelay;
+	private JLabel lblBackgroundImage;
+	private JLabel lblNumSprites;
+	private JLabel lblAnimation;
+	private JLabel lblSpeedX;
+	private JLabel lblRefreshMove;
+	private JLabel lblCanvas;
+	private JLabel lblPosY;
+	private JLabel lblCurrentObject;
+	private JLabel lblPlayPause;
+	private JLabel lblHeight;
+	private JLabel lblCols;
+	private JLabel lblWidth;
+	private JLabel lblRows;
+	private JLabel lblObject;
+	private JLabel lblTimeRefresh;
+	private JLabel lblBackgroundColor;
+	private JLabel lblSprite;
+	private JLabel lblSpeedY;
+	private JPanel panelOptions;
+	private JPanel panelAnimation;
+	private JPanel panelCanvas;
+	private JPanel panelSpriteSheet;
+	private JPanel panelObject;
+	private JPanel aux;
+
 	public PanelOptions(MainWindow window) {
 
 		this.window = window;
-
+		setLayout(new GridLayout(1, 1));
 		setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
-		setLayout(null);
 		setSize(WIDTH, HEIGHT);
+		setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		setLocation(MainWindow.WIDTH - WIDTH, 0);
 
 		settingComponents();
-	
+
+		addMouseListener(this);
+		addMouseMotionListener(this);
+
 	}
 
 	public void settingComponents() {
 
-		JLabel lblSprite = new JLabel("Sprite Sheet");
+		aux = new JPanel();
+
+		SpringLayout sl_aux = new SpringLayout();
+		aux.setLayout(sl_aux);
+
+		panelSpriteSheet = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelSpriteSheet, 422, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.WEST, panelSpriteSheet, 1, SpringLayout.WEST, this);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelSpriteSheet, 592, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.EAST, panelSpriteSheet, 307, SpringLayout.WEST, this);
+		aux.add(panelSpriteSheet);
+		panelSpriteSheet.setLayout(null);
+
+		lblSprite = new JLabel("Sprite Sheet");
+		lblSprite.setBounds(10, 0, 300, 45);
+		panelSpriteSheet.add(lblSprite);
 		lblSprite.setFont(new Font("Lato", Font.BOLD, 25));
 		lblSprite.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSprite.setBounds(10, 449, 300, 45);
-		add(lblSprite);
 
 		labNoSprites = new JLabel("No sprites found!");
+		labNoSprites.setBounds(10, 44, 300, 15);
+		panelSpriteSheet.add(labNoSprites);
 		labNoSprites.setHorizontalAlignment(SwingConstants.CENTER);
 		labNoSprites.setFont(new Font("Lato", Font.BOLD, 12));
-		labNoSprites.setBounds(10, 493, 300, 15);
-		add(labNoSprites);
 
-		JButton btnAddSprite = new JButton("Add Sprite Sheet");
-		btnAddSprite.addActionListener(a -> {
+		btnAddSprite = new JButton("Add Sprite Sheet");
+		btnAddSprite.setBounds(39, 61, 239, 31);
+		panelSpriteSheet.add(btnAddSprite);
 
-			// Adding a sprite sheet
-			JFileChooser chooser = new JFileChooser();
-			chooser.showDialog(null, "Upload Sprites");
-
-			String pathImage = "";
-			BufferedImage sprite = null;
-
-			try {
-
-				if (chooser.getSelectedFile() != null) {
-					fileSelected = chooser.getSelectedFile();
-					pathImage = fileSelected.getAbsolutePath();
-					sprite = ImageIO.read(new File(pathImage));
-					window.getApp().setCurrentSprite(sprite);
-					labNoSprites.setText(fileSelected.getName());
-					JOptionPane.showMessageDialog(null, "The Sprite has been uploaded successfully", "Sprite Uploaded",
-							JOptionPane.INFORMATION_MESSAGE, new ImageIcon(sprite));
-
-				}
-
-			} catch (Exception ex) {
-
-				ex.printStackTrace();
-
-			}
-
-		});
-		btnAddSprite.setBounds(39, 510, 239, 31);
-		add(btnAddSprite);
-
-		JLabel lblRows = new JLabel("# Rows");
+		lblRows = new JLabel("# Rows");
+		lblRows.setHorizontalAlignment(SwingConstants.CENTER);
+		lblRows.setBounds(10, 101, 76, 26);
+		panelSpriteSheet.add(lblRows);
 		lblRows.setFont(new Font("Lato", Font.BOLD, 15));
-		lblRows.setBounds(20, 550, 61, 26);
-		add(lblRows);
 
-		JLabel lblCols = new JLabel("# Cols");
+		lblCols = new JLabel("# Cols");
+		lblCols.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCols.setBounds(108, 100, 76, 28);
+		panelSpriteSheet.add(lblCols);
 		lblCols.setFont(new Font("Lato", Font.BOLD, 15));
-		lblCols.setBounds(166, 549, 55, 28);
-		add(lblCols);
 
 		SpinnerNumberModel model = new SpinnerNumberModel(1, 1, 9999, 1);
 
-		spinnerRows = new JSpinner(model);
-		spinnerRows.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				int rows = Integer.parseInt(spinnerRows.getModel().getValue().toString());
-				int cols = Integer.parseInt(spinnerCols.getModel().getValue().toString());
-
-				spinnerNumSprites.setModel(new SpinnerNumberModel(rows * cols, 1, rows * cols, 1));
-			}
-		});
-		spinnerRows.setBounds(78, 550, 76, 26);
-		add(spinnerRows);
-
 		SpinnerNumberModel model2 = new SpinnerNumberModel(1, 1, 9999, 1);
+
+		spinnerRows = new JSpinner(model);
+		spinnerRows.setBounds(12, 124, 84, 26);
+		panelSpriteSheet.add(spinnerRows);
 		spinnerCols = new JSpinner(model2);
+		spinnerCols.setBounds(110, 124, 84, 26);
+		panelSpriteSheet.add(spinnerCols);
+
+		lblNumSprites = new JLabel("# Sprites");
+		lblNumSprites.setBounds(215, 99, 63, 31);
+		panelSpriteSheet.add(lblNumSprites);
+		lblNumSprites.setFont(new Font("Lato", Font.BOLD, 15));
+
+		spinnerNumSprites = new JSpinner();
+		spinnerNumSprites.setBounds(206, 124, 84, 26);
+		panelSpriteSheet.add(spinnerNumSprites);
+		spinnerNumSprites.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
+
+		JSeparator separator = new JSeparator();
+		separator.setBounds(0, 162, 310, 2);
+		panelSpriteSheet.add(separator);
 		spinnerCols.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 
@@ -147,268 +196,525 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		spinnerCols.setBounds(219, 550, 76, 26);
-		add(spinnerCols);
+		spinnerRows.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				int rows = Integer.parseInt(spinnerRows.getModel().getValue().toString());
+				int cols = Integer.parseInt(spinnerCols.getModel().getValue().toString());
 
-		JLabel lblNumSprites = new JLabel("# Sprites");
-		lblNumSprites.setFont(new Font("Lato", Font.BOLD, 15));
-		lblNumSprites.setBounds(18, 584, 63, 31);
-		add(lblNumSprites);
+				spinnerNumSprites.setModel(new SpinnerNumberModel(rows * cols, 1, rows * cols, 1));
+			}
+		});
+		btnAddSprite.addActionListener(a -> {
 
-		spinnerNumSprites = new JSpinner();
-		spinnerNumSprites.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
-		spinnerNumSprites.setBounds(78, 586, 76, 26);
-		add(spinnerNumSprites);
+			// Adding a sprite sheet
+			JFileChooser chooser = new JFileChooser();
+			chooser.showDialog(window, "Upload Sprites");
 
-		JLabel lblDelay = new JLabel("Delay");
-		lblDelay.setFont(new Font("Lato", Font.BOLD, 15));
-		lblDelay.setBounds(166, 585, 55, 28);
-		add(lblDelay);
+			String pathImage = "";
+			BufferedImage sprite = null;
 
-		spinnerDelay = new JSpinner();
-		spinnerDelay.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
-		spinnerDelay.setBounds(219, 586, 76, 26);
-		add(spinnerDelay);
+			try {
 
-		JSeparator separator = new JSeparator();
-		separator.setBounds(0, 627, 310, 2);
-		add(separator);
+				if (chooser.getSelectedFile() != null) {
+					fileSelectedSprite = chooser.getSelectedFile();
+					pathImage = fileSelectedSprite.getAbsolutePath();
+					sprite = ImageIO.read(new File(pathImage));
+					window.getApp().getCurrentProject().setCurrentSpriteSheet(sprite);
+					labNoSprites.setText(fileSelectedSprite.getName());
 
-		JLabel lblObject = new JLabel("Object");
+					// Resized image to the Dialog
+
+					Image resized = ImageLoader.resizeToFit(sprite, new Dimension(250, 250));
+
+					JOptionPane.showMessageDialog(window, "The Sprite has been uploaded successfully",
+							"Sprite Uploaded", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(resized));
+
+				}
+
+			} catch (Exception ex) {
+
+				ex.printStackTrace();
+
+			}
+
+		});
+
+		panelObject = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelObject, 167, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.WEST, panelObject, 1, SpringLayout.WEST, this);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelObject, 422, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.EAST, panelObject, 306, SpringLayout.WEST, this);
+		aux.add(panelObject);
+		panelObject.setLayout(null);
+
+		lblObject = new JLabel("Object");
+		lblObject.setBounds(1, 6, 306, 45);
+		panelObject.add(lblObject);
 		lblObject.setHorizontalAlignment(SwingConstants.CENTER);
 		lblObject.setFont(new Font("Lato", Font.BOLD, 25));
-		lblObject.setBounds(10, 202, 300, 45);
-		add(lblObject);
 
-		JLabel lblPosX = new JLabel("x");
+		lblPosX = new JLabel("x");
+		lblPosX.setBounds(14, 139, 61, 26);
+		panelObject.add(lblPosX);
 		lblPosX.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPosX.setFont(new Font("Lato", Font.BOLD, 15));
-		lblPosX.setBounds(18, 335, 61, 26);
-		add(lblPosX);
 
-		JLabel lblPosY = new JLabel("y");
+		lblPosY = new JLabel("y");
+		lblPosY.setBounds(160, 138, 55, 28);
+		panelObject.add(lblPosY);
 		lblPosY.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPosY.setFont(new Font("Lato", Font.BOLD, 15));
-		lblPosY.setBounds(164, 334, 55, 28);
-		add(lblPosY);
 
 		spinnerPosX = new JSpinner();
-		spinnerPosX.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-
-				window.getApp().getCurrentObject().setX(Integer.parseInt(spinnerPosX.getModel().getValue().toString()));
-
-			}
-		});
-		spinnerPosX.setBounds(76, 335, 76, 26);
-		spinnerPosX.getModel().setValue(window.getApp().getObject().getX());
-		add(spinnerPosX);
+		spinnerPosX.setBounds(72, 139, 76, 26);
+		panelObject.add(spinnerPosX);
 
 		spinnerPosY = new JSpinner();
-		spinnerPosY.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
+		spinnerPosY.setBounds(213, 139, 76, 26);
+		panelObject.add(spinnerPosY);
 
-				window.getApp().getCurrentObject().setY(Integer.parseInt(spinnerPosY.getModel().getValue().toString()));
-			}
-		});
-		spinnerPosY.setBounds(217, 335, 76, 26);
-		spinnerPosY.getModel().setValue(window.getApp().getObject().getY());
-		add(spinnerPosY);
-
-		JLabel lblSpeedX = new JLabel("Speed X");
+		lblSpeedX = new JLabel("Speed X");
+		lblSpeedX.setBounds(12, 173, 63, 31);
+		panelObject.add(lblSpeedX);
 		lblSpeedX.setFont(new Font("Lato", Font.BOLD, 15));
-		lblSpeedX.setBounds(16, 369, 63, 31);
-		add(lblSpeedX);
 
 		spinnerSpeedX = new JSpinner();
-		spinnerSpeedX.addChangeListener(new ChangeListener() {
+		spinnerSpeedX.setBounds(72, 175, 76, 26);
+		panelObject.add(spinnerSpeedX);
+
+		lblSpeedY = new JLabel("Speed Y");
+		lblSpeedY.setBounds(151, 175, 67, 26);
+		panelObject.add(lblSpeedY);
+		lblSpeedY.setFont(new Font("Lato", Font.BOLD, 15));
+
+		spinnerSpeedY = new JSpinner();
+		spinnerSpeedY.setBounds(211, 175, 76, 26);
+		panelObject.add(spinnerSpeedY);
+
+		lblRefreshMove = new JLabel("Refresh Move (ms)");
+		lblRefreshMove.setBounds(2, 210, 117, 31);
+		panelObject.add(lblRefreshMove);
+		lblRefreshMove.setHorizontalAlignment(SwingConstants.CENTER);
+		lblRefreshMove.setFont(new Font("Lato", Font.BOLD, 13));
+
+		spinnerRefreshMove = new JSpinner();
+		spinnerRefreshMove.setBounds(116, 213, 174, 26);
+		panelObject.add(spinnerRefreshMove);
+		spinnerRefreshMove.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 
-				window.getApp().getCurrentObject()
-						.setSpeedX(Integer.parseInt(spinnerSpeedX.getModel().getValue().toString()));
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setRefreshMove(Integer.parseInt(spinnerRefreshMove.getModel().getValue().toString()));
 
 			}
 		});
-		spinnerSpeedX.setBounds(76, 371, 76, 26);
-		add(spinnerSpeedX);
+		spinnerRefreshMove.setModel(new SpinnerNumberModel(new Integer(10), new Integer(1), null, new Integer(1)));
 
-		JLabel lblSpeedY = new JLabel("Speed Y");
-		lblSpeedY.setFont(new Font("Lato", Font.BOLD, 15));
-		lblSpeedY.setBounds(155, 371, 67, 26);
-		add(lblSpeedY);
+		lblWidth = new JLabel("Width");
+		lblWidth.setBounds(12, 108, 61, 26);
+		panelObject.add(lblWidth);
+		lblWidth.setHorizontalAlignment(SwingConstants.CENTER);
+		lblWidth.setFont(new Font("Lato", Font.BOLD, 15));
 
-		spinnerSpeedY = new JSpinner();
+		lblHeight = new JLabel("Height");
+		lblHeight.setBounds(146, 110, 67, 22);
+		panelObject.add(lblHeight);
+		lblHeight.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHeight.setFont(new Font("Lato", Font.BOLD, 15));
+
+		spinnerWidth = new JSpinner();
+		spinnerWidth.setBounds(70, 108, 76, 26);
+		panelObject.add(spinnerWidth);
+		spinnerWidth.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setWidth(Integer.parseInt(spinnerWidth.getModel().getValue().toString()));
+
+			}
+		});
+		spinnerWidth.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
+
+		spinnerHeight = new JSpinner();
+		spinnerHeight.setBounds(211, 108, 76, 26);
+		panelObject.add(spinnerHeight);
+		spinnerHeight.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setHeight(Integer.parseInt(spinnerHeight.getModel().getValue().toString()));
+
+			}
+		});
+		spinnerHeight.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
+
+		Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+		lblCurrentObject = new JLabel("Current Object: Please select or create an Object");
+
+		lblCurrentObject.setBounds(2, 48, 305, 15);
+		panelObject.add(lblCurrentObject);
+		lblCurrentObject.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCurrentObject.setFont(new Font("Lato", Font.BOLD, 12));
+
+		btnUploadSkin = new JButton("Add Skin");
+		btnUploadSkin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				// Adding a skin to the object
+
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null) {
+					String nameSkin = JOptionPane.showInputDialog(window, "Put a name to this skin", "Skin name",
+							JOptionPane.QUESTION_MESSAGE);
+
+					if (nameSkin != null && !nameSkin.equals("")) {
+						JFileChooser chooser = new JFileChooser();
+						chooser.showDialog(window, "Add Skin to Object");
+
+						String pathImage = "";
+						BufferedImage skin = null;
+
+						try {
+
+							if (chooser.getSelectedFile() != null) {
+								fileSelectedSkin = chooser.getSelectedFile();
+								pathImage = fileSelectedSkin.getAbsolutePath();
+								skin = ImageIO.read(new File(pathImage));
+
+								// Adding skin
+
+								System.out.println(currentObject.getSkins().size());
+
+								window.getApp().getCurrentProject().getCurrentObject().addSkin(nameSkin, skin,
+										fileSelectedSkin);
+
+							}
+
+						} catch (Exception ex) {
+
+							JOptionPane.showMessageDialog(window, ex.getMessage(), "Error Adding Skin",
+									JOptionPane.ERROR_MESSAGE);
+
+						}
+
+					} else {
+
+						JOptionPane.showMessageDialog(window, "It can't add a Skin without a name.", "Error skin name",
+								JOptionPane.ERROR_MESSAGE);
+
+					}
+				} else {
+
+					JOptionPane.showMessageDialog(window, "First select an object or create one", "No Object Selected",
+							JOptionPane.WARNING_MESSAGE);
+
+				}
+			}
+		});
+		btnUploadSkin.setBounds(35, 67, 239, 31);
+		panelObject.add(btnUploadSkin);
+
+		JSeparator separator_1_1_2_1 = new JSeparator();
+		separator_1_1_2_1.setBounds(-21, 247, 326, 2);
+		panelObject.add(separator_1_1_2_1);
 		spinnerSpeedY.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 
-				window.getApp().getCurrentObject()
-						.setSpeedY(Integer.parseInt(spinnerSpeedY.getModel().getValue().toString()));
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setSpeedY(Integer.parseInt(spinnerSpeedY.getModel().getValue().toString()));
 
 			}
 		});
-		spinnerSpeedY.setBounds(215, 371, 76, 26);
-		add(spinnerSpeedY);
+		spinnerSpeedX.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
 
-		JSeparator separator_1 = new JSeparator();
-		separator_1.setBounds(0, 449, 310, 2);
-		add(separator_1);
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
 
-		JLabel lblAnimation = new JLabel("Animation");
+				if (currentObject != null)
+					currentObject.setSpeedX(Integer.parseInt(spinnerSpeedX.getModel().getValue().toString()));
+
+			}
+		});
+		spinnerPosY.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setY(Integer.parseInt(spinnerPosY.getModel().getValue().toString()));
+			}
+		});
+		spinnerPosX.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null)
+					currentObject.setX(Integer.parseInt(spinnerPosX.getModel().getValue().toString()));
+
+			}
+		});
+
+		panelAnimation = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelAnimation, 587, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.WEST, panelAnimation, 1, SpringLayout.WEST, this);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelAnimation, 746, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.EAST, panelAnimation, 307, SpringLayout.WEST, this);
+		aux.add(panelAnimation);
+		panelAnimation.setLayout(null);
+
+		lblAnimation = new JLabel("Animation");
+		lblAnimation.setBounds(93, 6, 133, 43);
+		panelAnimation.add(lblAnimation);
 		lblAnimation.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAnimation.setFont(new Font("Lato", Font.BOLD, 25));
-		lblAnimation.setBounds(88, 632, 133, 43);
-		add(lblAnimation);
 
-		JLabel lblTimeRefresh = new JLabel("Time Refresh (ms)");
+		lblTimeRefresh = new JLabel("Time Refresh (ms)");
+		lblTimeRefresh.setBounds(6, 51, 122, 31);
+		panelAnimation.add(lblTimeRefresh);
 		lblTimeRefresh.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTimeRefresh.setFont(new Font("Lato", Font.BOLD, 12));
-		lblTimeRefresh.setBounds(14, 677, 117, 31);
-		add(lblTimeRefresh);
+		lblTimeRefresh.setFont(new Font("Lato", Font.BOLD, 14));
 
 		spinnerTimeRefresh = new JSpinner();
+		spinnerTimeRefresh.setBounds(130, 53, 174, 26);
+		panelAnimation.add(spinnerTimeRefresh);
 		spinnerTimeRefresh.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 
 			}
 		});
 		spinnerTimeRefresh.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
-		spinnerTimeRefresh.setBounds(121, 679, 174, 26);
-		add(spinnerTimeRefresh);
 
 		JSeparator separator_1_1 = new JSeparator();
-		separator_1_1.setBounds(-5, 746, 326, 2);
-		add(separator_1_1);
+		separator_1_1.setBounds(0, 157, 326, 2);
+		panelAnimation.add(separator_1_1);
 
-		JLabel lblOptions = new JLabel("Options");
-		lblOptions.setHorizontalAlignment(SwingConstants.CENTER);
-		lblOptions.setFont(new Font("Lato", Font.BOLD, 25));
-		lblOptions.setBounds(10, 0, 300, 45);
-		add(lblOptions);
+		lblPlayPause = new JLabel("");
+		lblPlayPause.setBounds(239, 9, 40, 40);
+		panelAnimation.add(lblPlayPause);
+		lblPlayPause.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
 
-		JButton btnAddAnimation = new JButton("Add Animation to Object");
+				// Resume and pause current object's animation
+
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+
+				if (currentObject != null) {
+					Animation currentAnimation = window.getApp().getCurrentProject().getCurrentObject().getAnimation();
+
+					if (currentAnimation != null) {
+						if (!currentAnimation.isPause()) {
+							currentAnimation.setPause(true);
+						} else {
+							currentAnimation.setPause(false);
+							currentAnimation.getThread().resumeAnimation();
+						}
+
+					}
+				}
+			}
+		});
+		BufferedImage iconPlay = ImageLoader.cargarSprites("images/playpause.png");
+		Image myIconPlay = iconPlay.getScaledInstance(lblPlayPause.getWidth(), lblPlayPause.getHeight(),
+				Image.SCALE_SMOOTH);
+		lblPlayPause.setIcon(new ImageIcon(myIconPlay));
+
+		lblDelay = new JLabel("Delay");
+		lblDelay.setBounds(6, 80, 122, 28);
+		panelAnimation.add(lblDelay);
+		lblDelay.setHorizontalAlignment(SwingConstants.CENTER);
+		lblDelay.setFont(new Font("Lato", Font.BOLD, 15));
+
+		spinnerDelay = new JSpinner();
+		spinnerDelay.setBounds(130, 81, 174, 26);
+		panelAnimation.add(spinnerDelay);
+		spinnerDelay.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
+
+		btnAddAnimation = new JButton("Add Animation to Object");
+		btnAddAnimation.setBounds(70, 120, 190, 31);
+		panelAnimation.add(btnAddAnimation);
 		btnAddAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
 				// Adding animation to current object
 
-				BufferedImage currentSprite = window.getApp().getCurrentSprite();
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
 
-				if (currentSprite != null) {
-					int sprites = Integer.parseInt(spinnerNumSprites.getModel().getValue().toString());
-					int rows = Integer.parseInt(spinnerRows.getModel().getValue().toString());
-					int cols = Integer.parseInt(spinnerCols.getModel().getValue().toString());
-					int delay = Integer.parseInt(spinnerDelay.getModel().getValue().toString());
-					int refresh = Integer.parseInt(spinnerTimeRefresh.getModel().getValue().toString());
+				if (currentObject != null) {
+					BufferedImage currentSprite = window.getApp().getCurrentProject().getCurrentSpriteSheet();
 
-					try {
-						Animation animation = new Animation(currentSprite, sprites, delay, cols, rows,
-								window.getApp().getCurrentObject(), refresh);
+					if (currentSprite != null) {
+						int sprites = Integer.parseInt(spinnerNumSprites.getModel().getValue().toString());
+						int rows = Integer.parseInt(spinnerRows.getModel().getValue().toString());
+						int cols = Integer.parseInt(spinnerCols.getModel().getValue().toString());
+						int delay = Integer.parseInt(spinnerDelay.getModel().getValue().toString());
+						int refresh = Integer.parseInt(spinnerTimeRefresh.getModel().getValue().toString());
 
-						window.getApp().getCurrentObject().setAnimation(animation);
+						try {
 
-						window.getApp().getCurrentObject().getAnimation().getThread().start();
+							String id = JOptionPane.showInputDialog(window, "Put a name ID to this Animation",
+									"Animation ID", JOptionPane.QUESTION_MESSAGE);
 
-//						spinnerTimeRefresh.getModel().setValue(window.getApp().getCurrentObject().getAnimation().getTimeRefresh());
+							if (id != null && !id.equals("")) {
 
-					} catch (Exception ex) {
+								// Add Animation
 
-						JOptionPane.showMessageDialog(null, ex.getCause() + "\n" + ex.getLocalizedMessage()
-								+ "\n There is a problem with the sprite sheet. Please check columns and rows and the quantity of sprites.",
-								"FATAL ERROR", JOptionPane.ERROR_MESSAGE);
+								window.getApp().getCurrentProject().getCurrentObject().addAnimation(id, currentSprite,
+										sprites, delay, cols, rows, refresh, fileSelectedSprite);
+
+							} else {
+
+								JOptionPane.showMessageDialog(window,
+										"It can't add an Animation without an ID. \n Try again please.",
+										"Error No Animation ID", JOptionPane.ERROR_MESSAGE);
+
+							}
+						} catch (Exception ex) {
+
+							JOptionPane.showMessageDialog(null, ex.getCause() + "\n" + ex.getLocalizedMessage()
+									+ "\n There is a problem with the sprite sheet. Please check columns and rows and the quantity of sprites.",
+									"FATAL ERROR", JOptionPane.ERROR_MESSAGE);
+
+						}
+
+					} else {
+
+						JOptionPane.showMessageDialog(null, "First add a Sprite Sheet", "Error - No Sprite sheet found",
+								JOptionPane.ERROR_MESSAGE);
 
 					}
 
 				} else {
 
-					JOptionPane.showMessageDialog(null, "First add a Sprite Sheet", "Error - No Sprite sheet found",
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(window, "First select an object or create one", "No Object Selected",
+							JOptionPane.WARNING_MESSAGE);
+
+				}
+			}
+		});
+
+		panelOptions = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelOptions, 0, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.WEST, panelOptions, 1, SpringLayout.WEST, this);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelOptions, 176, SpringLayout.NORTH, this);
+		sl_aux.putConstraint(SpringLayout.EAST, panelOptions, 309, SpringLayout.WEST, this);
+		aux.add(panelOptions);
+		panelOptions.setLayout(null);
+
+		lblOptions = new JLabel("Options");
+		lblOptions.setBounds(95, 4, 121, 37);
+		panelOptions.add(lblOptions);
+		lblOptions.setHorizontalAlignment(SwingConstants.CENTER);
+		lblOptions.setFont(new Font("Lato", Font.BOLD, 25));
+
+		btnSettings = new JButton("Settings");
+		btnSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				// Open Settings
+				JDialog settings = new JDialog(window, "Settings");
+
+				settings.getContentPane().setLayout(new GridLayout(1, 3));
+				JLabel lblTheme = new JLabel("Theme");
+				JButton btnDefault = new JButton("Default");
+				btnDefault.addActionListener(a -> {
+
+					setDefaultTheme();
+
+				});
+				JButton btnDark = new JButton("Dark");
+				btnDark.addActionListener(a -> {
+
+					setDarkMode();
+
+				});
+				settings.getContentPane().add(lblTheme);
+				settings.getContentPane().add(btnDefault);
+				settings.getContentPane().add(btnDark);
+				settings.pack();
+				settings.setLocationRelativeTo(null);
+				settings.setVisible(true);
+
+			}
+		});
+		btnSettings.setBounds(60, 121, 190, 31);
+		panelOptions.add(btnSettings);
+
+		btnCreateObject = new JButton("Create a new Object");
+		btnCreateObject.setToolTipText("Create an object and add it to the canvas");
+		btnCreateObject.setBounds(60, 50, 190, 31);
+		panelOptions.add(btnCreateObject);
+
+		btnMyObjects = new JButton("My Objects");
+		btnMyObjects.setToolTipText("Shows the list of all the objects created");
+		btnMyObjects.setBounds(60, 85, 190, 31);
+		panelOptions.add(btnMyObjects);
+
+		JSeparator separator_1_1_2 = new JSeparator();
+		separator_1_1_2.setBounds(-18, 164, 326, 2);
+		panelOptions.add(separator_1_1_2);
+
+		btnFullScreen = new JButton("");
+		btnFullScreen.setToolTipText("Exit FullScreen Mode");
+		btnFullScreen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				if (window.isFullScreen()) {
+
+					window.dispose();
+					window.setUndecorated(false);
+					window.setFullScreen(false);
+					window.setVisible(true);
+
+					btnFullScreen.setToolTipText("Open FullScreen Mode");
+
+				} else {
+
+					window.dispose();
+					window.setUndecorated(true);
+					window.setFullScreen(true);
+					window.setVisible(true);
+					btnFullScreen.setToolTipText("Exit FullScreen Mode");
 
 				}
 
 			}
 		});
-		btnAddAnimation.setBounds(62, 87, 190, 31);
-		add(btnAddAnimation);
+		btnFullScreen.setBounds(253, 4, 49, 37);
+		BufferedImage fullScreenImage = ImageLoader.cargarSprites("images/fullScreen.png");
+		Image iconFullScreen = fullScreenImage.getScaledInstance(btnFullScreen.getWidth() - 10,
+				btnFullScreen.getHeight() - 10, Image.SCALE_SMOOTH);
+		btnFullScreen.setIcon(new ImageIcon(iconFullScreen));
 
-		JButton btnMyAnimations = new JButton("My Animations");
-		btnMyAnimations.setBounds(62, 159, 190, 31);
-		add(btnMyAnimations);
-
-		JSeparator separator_1_1_1 = new JSeparator();
-		separator_1_1_1.setBounds(0, 202, 310, 2);
-		add(separator_1_1_1);
-
-		JLabel lblRefreshMove = new JLabel("Refresh Move (ms)");
-		lblRefreshMove.setHorizontalAlignment(SwingConstants.CENTER);
-		lblRefreshMove.setFont(new Font("Lato", Font.BOLD, 12));
-		lblRefreshMove.setBounds(10, 406, 117, 31);
-		add(lblRefreshMove);
-
-		spinnerRefreshMove = new JSpinner();
-		spinnerRefreshMove.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-
-				window.getApp().getCurrentObject()
-						.setRefreshMove(Integer.parseInt(spinnerRefreshMove.getModel().getValue().toString()));
+		panelOptions.add(btnFullScreen);
+		btnMyObjects.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
 
 			}
 		});
-		spinnerRefreshMove.setModel(new SpinnerNumberModel(new Integer(10), new Integer(1), null, new Integer(1)));
-		spinnerRefreshMove.setBounds(120, 409, 174, 26);
-		add(spinnerRefreshMove);
-
-		JLabel lblWidth = new JLabel("Width");
-		lblWidth.setHorizontalAlignment(SwingConstants.CENTER);
-		lblWidth.setFont(new Font("Lato", Font.BOLD, 15));
-		lblWidth.setBounds(16, 304, 61, 26);
-		add(lblWidth);
-
-		JLabel lblHeight = new JLabel("Height");
-		lblHeight.setHorizontalAlignment(SwingConstants.CENTER);
-		lblHeight.setFont(new Font("Lato", Font.BOLD, 15));
-		lblHeight.setBounds(150, 306, 67, 22);
-		add(lblHeight);
-
-		spinnerWidth = new JSpinner();
-		spinnerWidth.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-
-				window.getApp().getCurrentObject()
-						.setWidth(Integer.parseInt(spinnerWidth.getModel().getValue().toString()));
-				;
-			}
-		});
-		spinnerWidth.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
-		spinnerWidth.setBounds(74, 304, 76, 26);
-		add(spinnerWidth);
-
-		spinnerHeight = new JSpinner();
-		spinnerHeight.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-
-				window.getApp().getCurrentObject()
-						.setHeight(Integer.parseInt(spinnerHeight.getModel().getValue().toString()));
-				;
-
-			}
-		});
-		spinnerHeight.setModel(new SpinnerNumberModel(new Integer(100), new Integer(10), null, new Integer(1)));
-		spinnerHeight.setBounds(215, 304, 76, 26);
-		add(spinnerHeight);
-
-		JButton btnCreateObject = new JButton("Create a new Object");
 		btnCreateObject.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
 				// Creating and adding an object
-				
+
 				String name = JOptionPane.showInputDialog(null, "Please enter a name to this Object",
 						"Adding an Object", JOptionPane.QUESTION_MESSAGE);
 
 				try {
 					if (name != null && !name.equalsIgnoreCase("")) {
-						window.getApp().addObject(name);
-						defaultValuesSpinners();
+						window.getApp().getCurrentProject().addObject(name);
+						updateValues();
 					} else {
 						JOptionPane.showMessageDialog(null, "Please enter a name or the object it won't be added",
 								"Error", JOptionPane.ERROR_MESSAGE);
@@ -422,49 +728,197 @@ public class PanelOptions extends JPanel {
 
 			}
 		});
-		btnCreateObject.setBounds(62, 50, 190, 31);
-		add(btnCreateObject);
 
-		JButton btnSaveAnimations = new JButton("Save Animations Into Object");
-		btnSaveAnimations.addActionListener(new ActionListener() {
+		add(aux);
+
+		panelCanvas = new JPanel();
+		sl_aux.putConstraint(SpringLayout.NORTH, panelCanvas, 3, SpringLayout.SOUTH, panelAnimation);
+		sl_aux.putConstraint(SpringLayout.WEST, panelCanvas, 1, SpringLayout.WEST, aux);
+		sl_aux.putConstraint(SpringLayout.SOUTH, panelCanvas, 162, SpringLayout.SOUTH, panelAnimation);
+		sl_aux.putConstraint(SpringLayout.EAST, panelCanvas, 0, SpringLayout.EAST, panelSpriteSheet);
+		aux.add(panelCanvas);
+		SpringLayout sl_panelCanvas = new SpringLayout();
+		panelCanvas.setLayout(sl_panelCanvas);
+
+		lblCanvas = new JLabel("Canvas");
+		sl_panelCanvas.putConstraint(SpringLayout.NORTH, lblCanvas, 10, SpringLayout.NORTH, panelCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.WEST, lblCanvas, -215, SpringLayout.EAST, panelCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.EAST, lblCanvas, -84, SpringLayout.EAST, panelCanvas);
+		lblCanvas.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCanvas.setFont(new Font("Lato", Font.BOLD, 25));
+		panelCanvas.add(lblCanvas);
+
+		btnCanvasColor = new JButton("Select a Color");
+		sl_panelCanvas.putConstraint(SpringLayout.NORTH, btnCanvasColor, 7, SpringLayout.SOUTH, lblCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.WEST, btnCanvasColor, 157, SpringLayout.WEST, panelCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.SOUTH, btnCanvasColor, -83, SpringLayout.SOUTH, panelCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.EAST, btnCanvasColor, -10, SpringLayout.EAST, panelCanvas);
+		btnCanvasColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
+				JColorChooser colorChooser = new JColorChooser();
+				JButton btnChooseColor = new JButton("Pick this Color");
+
+				JDialog dialogColor = new JDialog(window, "Canvas Color");
+				dialogColor.getContentPane().setLayout(new BorderLayout());
+
+				dialogColor.getContentPane().add(colorChooser, BorderLayout.CENTER);
+				dialogColor.getContentPane().add(btnChooseColor, BorderLayout.SOUTH);
+
+				dialogColor.pack();
+				dialogColor.setLocationRelativeTo(null);
+				dialogColor.setVisible(true);
+
+				colorChooser.isVisible();
+
+				btnChooseColor.addActionListener(a -> {
+
+					// Setting canvas color
+
+					window.getCanvas().setBackground(colorChooser.getColor());
+					btnCanvasColor.setBackground(colorChooser.getColor());
+
+					dialogColor.dispose();
+
+				});
+
 			}
 		});
-		btnSaveAnimations.setBounds(62, 124, 190, 31);
-		add(btnSaveAnimations);
+		btnCanvasColor.setBackground(new Color(255, 255, 255));
+		panelCanvas.add(btnCanvasColor);
 
-		JLabel lblNoSkinFound = new JLabel("No skin found!");
-		lblNoSkinFound.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNoSkinFound.setFont(new Font("Lato", Font.BOLD, 12));
-		lblNoSkinFound.setBounds(10, 244, 300, 15);
-		add(lblNoSkinFound);
+		btnBackgroundImage = new JButton("Add an Image");
+		btnBackgroundImage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
 
-		JButton btnUploadSkin = new JButton("Add Skin");
-		btnUploadSkin.setBounds(39, 263, 239, 31);
-		add(btnUploadSkin);
-		
-		JLabel lblPlayPause = new JLabel("");
-		lblPlayPause.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				
-			// Resume and pause current object's animation
-				
-				
-				
+				// Adding background image to canvas
+
+				JFileChooser chooser = new JFileChooser();
+				chooser.showDialog(window, "Upload Background to Canvas");
+
+				String pathImage = "";
+				BufferedImage background = null;
+
+				try {
+
+					if (chooser.getSelectedFile() != null) {
+						backgroundImageCanvas = chooser.getSelectedFile();
+						pathImage = backgroundImageCanvas.getAbsolutePath();
+						background = ImageIO.read(new File(pathImage));
+						window.getCanvas().setBackgroundImage(background);
+
+					}
+
+				} catch (Exception ex) {
+
+					ex.printStackTrace();
+
+				}
+
 			}
 		});
-		lblPlayPause.setBounds(240, 635, 40, 40);
-		
-		BufferedImage iconPlay = ImageLoader.cargarSprites("images/playpause.png");
-		Image myIconPlay = iconPlay.getScaledInstance(lblPlayPause.getWidth(), lblPlayPause.getHeight(), Image.SCALE_SMOOTH);
-		lblPlayPause.setIcon(new ImageIcon(myIconPlay));
-		
-		add(lblPlayPause);
-		
-		
-		
+		sl_panelCanvas.putConstraint(SpringLayout.NORTH, btnBackgroundImage, 6, SpringLayout.SOUTH, btnCanvasColor);
+		sl_panelCanvas.putConstraint(SpringLayout.WEST, btnBackgroundImage, 157, SpringLayout.WEST, panelCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.EAST, btnBackgroundImage, 0, SpringLayout.EAST, btnCanvasColor);
+		panelCanvas.add(btnBackgroundImage);
+
+		lblBackgroundColor = new JLabel("Background Color");
+		lblBackgroundColor.setFont(new Font("Lato", Font.BOLD, 13));
+		lblBackgroundColor.setHorizontalAlignment(SwingConstants.CENTER);
+		sl_panelCanvas.putConstraint(SpringLayout.NORTH, lblBackgroundColor, 0, SpringLayout.NORTH, btnCanvasColor);
+		sl_panelCanvas.putConstraint(SpringLayout.WEST, lblBackgroundColor, 10, SpringLayout.WEST, panelCanvas);
+		sl_panelCanvas.putConstraint(SpringLayout.SOUTH, lblBackgroundColor, 0, SpringLayout.SOUTH, btnCanvasColor);
+		sl_panelCanvas.putConstraint(SpringLayout.EAST, lblBackgroundColor, -26, SpringLayout.WEST, btnCanvasColor);
+		panelCanvas.add(lblBackgroundColor);
+
+		lblBackgroundImage = new JLabel("Background Image");
+		sl_panelCanvas.putConstraint(SpringLayout.NORTH, lblBackgroundImage, 6, SpringLayout.NORTH, btnBackgroundImage);
+		sl_panelCanvas.putConstraint(SpringLayout.WEST, lblBackgroundImage, 0, SpringLayout.WEST, lblBackgroundColor);
+		sl_panelCanvas.putConstraint(SpringLayout.EAST, lblBackgroundImage, 0, SpringLayout.EAST, lblBackgroundColor);
+		lblBackgroundImage.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBackgroundImage.setFont(new Font("Lato", Font.BOLD, 13));
+		panelCanvas.add(lblBackgroundImage);
+
+	}
+
+	public void setDarkMode() {
+
+		aux.setBackground(new Color(75, 75, 75));
+
+		for (int i = 0; i < aux.getComponentCount(); i++) {
+
+			JPanel temp = (JPanel) aux.getComponent(i);
+
+			temp.setBackground(new Color(75, 75, 75));
+
+			for (int j = 0; j < temp.getComponents().length; j++) {
+
+				if (temp.getComponent(j) instanceof JLabel) {
+
+					temp.getComponent(j).setForeground(Color.WHITE);
+
+				}
+
+				if (temp.getComponent(j) instanceof JButton) {
+
+					temp.getComponent(j).setBackground(Color.BLACK);
+					temp.getComponent(j).setForeground(Color.WHITE);
+
+				}
+
+			}
+
+		}
+
+		BufferedImage fsWhite = ImageLoader.cargarSprites("images/fullScreenWhite.png");
+		Image fsIconWhite = fsWhite.getScaledInstance(btnFullScreen.getWidth() - 10, btnFullScreen.getHeight() - 10,
+				Image.SCALE_SMOOTH);
+		btnFullScreen.setIcon(new ImageIcon(fsIconWhite));
+
+		BufferedImage playWhite = ImageLoader.cargarSprites("images/playpauseWhite.png");
+		Image playIconWhite = playWhite.getScaledInstance(lblPlayPause.getWidth(), lblPlayPause.getHeight(),
+				Image.SCALE_SMOOTH);
+		lblPlayPause.setIcon(new ImageIcon(playIconWhite));
+
+	}
+
+	public void setDefaultTheme() {
+
+		aux.setBackground(null);
+
+		for (int i = 0; i < aux.getComponentCount(); i++) {
+
+			JPanel temp = (JPanel) aux.getComponent(i);
+
+			temp.setBackground(null);
+
+			for (int j = 0; j < temp.getComponents().length; j++) {
+
+				if (temp.getComponent(j) instanceof JLabel) {
+
+					temp.getComponent(j).setForeground(Color.BLACK);
+
+				}
+
+				if (temp.getComponent(j) instanceof JButton) {
+
+					temp.getComponent(j).setBackground(null);
+					temp.getComponent(j).setForeground(Color.BLACK);
+
+				}
+
+			}
+
+		}
+
+		BufferedImage fs = ImageLoader.cargarSprites("images/fullScreen.png");
+		Image fsIcon = fs.getScaledInstance(btnFullScreen.getWidth() - 10, btnFullScreen.getHeight() - 10,
+				Image.SCALE_SMOOTH);
+		btnFullScreen.setIcon(new ImageIcon(fsIcon));
+
+		BufferedImage play = ImageLoader.cargarSprites("images/playpause.png");
+		Image playIcon = play.getScaledInstance(lblPlayPause.getWidth(), lblPlayPause.getHeight(), Image.SCALE_SMOOTH);
+		lblPlayPause.setIcon(new ImageIcon(playIcon));
 
 	}
 
@@ -516,53 +970,230 @@ public class PanelOptions extends JPanel {
 		return spinnerHeight;
 	}
 
-	public File getFileSelected() {
-		return fileSelected;
+	public File getfileSelectedSprite() {
+		return fileSelectedSprite;
 	}
 
-	public void setFileSelected(File fileSelected) {
-		this.fileSelected = fileSelected;
-	}
-
-	public void defaultValuesSpinners() {
-
-		Object currentObject = window.getApp().getCurrentObject();
-
-		spinnerPosX.getModel().setValue(currentObject.getX());
-		spinnerPosY.getModel().setValue(currentObject.getY());
-		spinnerWidth.getModel().setValue(currentObject.getWidth());
-		spinnerHeight.getModel().setValue(currentObject.getHeight());
-		spinnerRefreshMove.getModel().setValue(currentObject.getRefreshMove());
-		spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
-		spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
-
-		if (currentObject.getAnimation() != null)
-			spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
-		else
-			spinnerTimeRefresh.getModel().setValue(1);
-
+	public void setfileSelectedSprite(File fileSelectedSprite) {
+		this.fileSelectedSprite = fileSelectedSprite;
 	}
 
 	public void updateValues() {
 
-		Object currentObject = window.getApp().getCurrentObject();
+		Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
 
-		spinnerPosX.getModel().setValue(currentObject.getX());
-		spinnerPosY.getModel().setValue(currentObject.getY());
-		spinnerWidth.getModel().setValue(currentObject.getWidth());
-		spinnerHeight.getModel().setValue(currentObject.getHeight());
-		spinnerRefreshMove.getModel().setValue(currentObject.getRefreshMove());
-		spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
-		spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
+		if (currentObject != null) {
+			lblCurrentObject.setText("Current Object: " + currentObject.getNameID());
 
-		if (currentObject.getAnimation() != null)
-			spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
-		else
-			spinnerTimeRefresh.getModel().setValue(1);
+			spinnerPosX.getModel().setValue(currentObject.getX());
+			spinnerPosY.getModel().setValue(currentObject.getY());
+			spinnerWidth.getModel().setValue(currentObject.getWidth());
+			spinnerHeight.getModel().setValue(currentObject.getHeight());
+			spinnerRefreshMove.getModel().setValue(currentObject.getRefreshMove());
+			spinnerSpeedX.getModel().setValue(currentObject.getSpeedX());
+			spinnerSpeedY.getModel().setValue(currentObject.getSpeedY());
 
+			if (currentObject.getAnimation() != null) {
+				spinnerTimeRefresh.getModel().setValue(currentObject.getAnimation().getTimeRefresh());
+			} else {
+				spinnerTimeRefresh.getModel().setValue(1);
+			}
+		}
 	}
 
 	public JSpinner getSpinnerRefreshMove() {
 		return spinnerRefreshMove;
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+
+		window.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+
+		if (origin != null) {
+
+			int deltaY = origin.y - e.getY();
+
+			setLocation(getX(), getY() - deltaY);
+
+		}
+
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent arg0) {
+
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		origin = new Point(e.getPoint());
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+
+		window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+	}
+
+	public JButton getBtnCreateObject() {
+		return btnCreateObject;
+	}
+
+	public JLabel getLblOptions() {
+		return lblOptions;
+	}
+
+	public JButton getBtnAddAnimation() {
+		return btnAddAnimation;
+	}
+
+	public JButton getBtnFullScreen() {
+		return btnFullScreen;
+	}
+
+	public JButton getBtnAddSprite() {
+		return btnAddSprite;
+	}
+
+	public JButton getBtnMyObjects() {
+		return btnMyObjects;
+	}
+
+	public JButton getBtnBackgroundImage() {
+		return btnBackgroundImage;
+	}
+
+	public JButton getBtnUploadSkin() {
+		return btnUploadSkin;
+	}
+
+	public JButton getBtnSettings() {
+		return btnSettings;
+	}
+
+	public JButton getBtnCanvasColor() {
+		return btnCanvasColor;
+	}
+
+	public JLabel getLblPosX() {
+		return lblPosX;
+	}
+
+	public JLabel getLblDelay() {
+		return lblDelay;
+	}
+
+	public JLabel getLblBackgroundImage() {
+		return lblBackgroundImage;
+	}
+
+	public JLabel getLblNumSprites() {
+		return lblNumSprites;
+	}
+
+	public JLabel getLblAnimation() {
+		return lblAnimation;
+	}
+
+	public JLabel getLblSpeedX() {
+		return lblSpeedX;
+	}
+
+	public JLabel getLblRefreshMove() {
+		return lblRefreshMove;
+	}
+
+	public JLabel getLblCanvas() {
+		return lblCanvas;
+	}
+
+	public JLabel getLblPosY() {
+		return lblPosY;
+	}
+
+	public JLabel getLblNoSkinFound() {
+		return lblCurrentObject;
+	}
+
+	public JLabel getLblPlayPause() {
+		return lblPlayPause;
+	}
+
+	public JLabel getLblHeight() {
+		return lblHeight;
+	}
+
+	public JLabel getLblCols() {
+		return lblCols;
+	}
+
+	public JLabel getLblWidth() {
+		return lblWidth;
+	}
+
+	public JLabel getLblRows() {
+		return lblRows;
+	}
+
+	public JLabel getLblObject() {
+		return lblObject;
+	}
+
+	public JLabel getLblTimeRefresh() {
+		return lblTimeRefresh;
+	}
+
+	public JLabel getLblBackgroundColor() {
+		return lblBackgroundColor;
+	}
+
+	public JLabel getLblSprite() {
+		return lblSprite;
+	}
+
+	public JLabel getLblSpeedY() {
+		return lblSpeedY;
+	}
+
+	public JPanel getPanelOptions() {
+		return panelOptions;
+	}
+
+	public JPanel getPanelAnimation() {
+		return panelAnimation;
+	}
+
+	public JPanel getPanelCanvas() {
+		return panelCanvas;
+	}
+
+	public JPanel getPanelSpriteSheet() {
+		return panelSpriteSheet;
+	}
+
+	public JPanel getPanelObject() {
+		return panelObject;
+	}
+
+	public JPanel getAux() {
+		return aux;
 	}
 }

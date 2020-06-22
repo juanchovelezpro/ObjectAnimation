@@ -1,7 +1,9 @@
 package view;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -19,14 +21,16 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 
 	private MainWindow window;
 
+	private Image backgroundImage;
+
 	public Canvas(MainWindow window) {
-		setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
+		setBorder(new LineBorder(Color.DARK_GRAY, 2, true));
 
 		this.window = window;
 		setLayout(null);
 		setBackground(Color.WHITE);
 		setSize(WIDTH, HEIGHT);
-		setLocation(0, 5);
+		setLocation(0, 0);
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -38,15 +42,26 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 
 		super.paintComponent(g);
 
+		if (backgroundImage != null)
+			g.drawImage(backgroundImage, 0, 0, null);
+
 		renderObjects(g);
 
 		repaint();
 
 	}
 
+	public Image getBackgroundImage() {
+		return backgroundImage;
+	}
+
+	public void setBackgroundImage(Image backgroundImage) {
+		this.backgroundImage = backgroundImage;
+	}
+
 	public void renderObjects(Graphics g) {
 
-		ArrayList<Object> objects = window.getApp().getMyObjects();
+		ArrayList<Object> objects = window.getApp().getCurrentProject().getMyObjects();
 
 		for (int i = 0; i < objects.size(); i++) {
 
@@ -61,8 +76,6 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 	@Override
 	public void mouseClicked(MouseEvent e) {
 
-	
-
 	}
 
 	@Override
@@ -73,13 +86,12 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 	@Override
 	public void mouseExited(MouseEvent e) {
 
-
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
 
-		ArrayList<Object> objects = window.getApp().getMyObjects();
+		ArrayList<Object> objects = window.getApp().getCurrentProject().getMyObjects();
 
 		for (int i = 0; i < objects.size(); i++) {
 
@@ -88,41 +100,52 @@ public class Canvas extends JPanel implements MouseMotionListener, MouseListener
 			if (e.getX() >= temp.getX() && e.getX() <= temp.getX() + temp.getWidth() && e.getY() >= temp.getY()
 					&& e.getY() <= temp.getY() + temp.getHeight()) {
 
-				window.getApp().setCurrentObject(temp);
+				window.getApp().getCurrentProject().setCurrentObject(temp);
+				window.getOptions().updateValues();
 				temp.setX(e.getX() - temp.getWidth() / 2);
 				temp.setY(e.getY() - temp.getHeight() / 2);
 
 			}
 
 		}
-		
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+
+		window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
 
-		Object current = window.getApp().getCurrentObject();
+		Object current = window.getApp().getCurrentProject().getCurrentObject();
 
-		if (e.getX() >= current.getX() && e.getX() <= current.getX() + current.getWidth() && e.getY() >= current.getY()
-				&& e.getY() <= current.getY() + current.getHeight()) {
+		if (current != null) {
 
-			current.setX(e.getX() - current.getWidth() / 2);
-			current.setY(e.getY() - current.getHeight() / 2);
+			if (e.getX() >= current.getX() && e.getX() <= current.getX() + current.getWidth()
+					&& e.getY() >= current.getY() && e.getY() <= current.getY() + current.getHeight()) {
 
-			window.getOptions().updateValues();
+				window.setCursor(new Cursor(Cursor.MOVE_CURSOR));
 
+				current.setX(e.getX() - current.getWidth() / 2);
+				current.setY(e.getY() - current.getHeight() / 2);
+
+				window.getOptions().updateValues();
+
+			} else {
+
+				window.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+			}
 		}
 
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
-
 
 	}
 
