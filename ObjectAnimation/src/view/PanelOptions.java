@@ -537,6 +537,20 @@ public class PanelOptions extends JPanel implements MouseMotionListener, MouseLi
 		lblDelay.setFont(new Font("Lato", Font.BOLD, 15));
 
 		spinnerDelay = new JSpinner();
+		spinnerDelay.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				
+				Object currentObject = window.getApp().getCurrentProject().getCurrentObject();
+				
+				if(currentObject.getAnimation() != null) {
+					
+					currentObject.getAnimation().setDelay(Integer.parseInt(spinnerDelay.getModel().getValue().toString()));
+					
+				}
+				
+				
+			}
+		});
 		spinnerDelay.setBounds(130, 81, 174, 26);
 		panelAnimation.add(spinnerDelay);
 		spinnerDelay.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
