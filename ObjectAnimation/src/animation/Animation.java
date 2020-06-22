@@ -144,6 +144,7 @@ public class Animation implements Comparable<Animation>, Serializable {
 
 			for (int j = 1; j <= col; j++, k++) {
 
+				if(k<frames)
 				images[k] = ss.grabImage(i, j, (int) spriteSheet.getWidth() / col, (int) spriteSheet.getHeight() / row);
 
 			}
